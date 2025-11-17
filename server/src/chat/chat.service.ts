@@ -369,7 +369,7 @@ export class ChatService {
                     {
                       text: 'Открыть чат',
                       web_app: {
-                        url: `https://trueassist-bot-iaj84.ondigitalocean.app/admin/chat/${message.chat.id}`,
+                        url: `https://trueassist-bot-gpzkw.ondigitalocean.app/admin/chat/${message.chat.id}`,
                       },
                     },
                   ],
