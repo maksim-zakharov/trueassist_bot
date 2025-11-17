@@ -1,0 +1,18 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Правила для Redux Toolkit Query (RTK Query)
+
+## Code Generation
+- Все API-запросы для Frontend должны использовать **RTK Query**.
+- Запрещено напрямую использовать `fetch`, `axios`, `createAsyncThunk`.
+- Генерировать код по шаблону:
+  ```ts
+  // Шаблон для API-слоя
+  import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+  export const api = createApi({ 
+    baseQuery: fetchBaseQuery({ baseUrl: 'https://api.example.com' }),
+    endpoints: (builder) => ({ ... }),
+  });

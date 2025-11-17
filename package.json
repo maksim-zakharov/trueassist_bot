@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "start:ci": "node ./server/scripts/setup-env.js && npm run start:prod",
+    "start:prod": "cd server && npm run start:prod",
+    "build:ci": "cd server && npm install && npm run build:ci"
+  }
+}

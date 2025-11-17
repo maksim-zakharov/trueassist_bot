@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" class="dark root-bg-color">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">-->
+<!--    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,interactive-widget=resizes-content">-->
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, interactive-widget=resizes-content">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <script>
+      if(localStorage.getItem('__telegram__initParams')){
+      sessionStorage.setItem('__telegram__initParams', localStorage.getItem('__telegram__initParams'))
+      }
+      if(localStorage.getItem('__telegram__themeParams')){
+        sessionStorage.setItem('__telegram__themeParams', localStorage.getItem('__telegram__themeParams'))
+      }
+    </script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Qlean Clone</title>
+  </head>
+  <body class="root-bg-color">
+    <div id="root" class="root-bg-color"></div>
+    <script>
+      // Добавляем версию к URL скриптов для предотвращения кеширования
+      window.appVersion = Date.now();
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,441 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+    overflow: hidden;
+    touch-action: none;
+}
+
+:root {
+    /*overflow: hidden;*/
+    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+
+    color-scheme: light;
+    color: rgba(255, 255, 255, 0.87);
+    background-color: var(--tg-theme-bg-color);
+
+    --quaternary-fill-background: rgba(122, 122, 122, 0.18);
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    --radius: 0.625rem;
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0 0);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.145 0 0);
+    --primary: oklch(0.205 0 0);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.97 0 0);
+    --secondary-foreground: oklch(0.205 0 0);
+    --muted: oklch(0.97 0 0);
+    /*--muted-foreground: oklch(0.556 0 0);*/
+    --muted-foreground: hsl(215.4 16.3% 44%);
+    --accent: oklch(0.97 0 0);
+    --accent-foreground: oklch(0.205 0 0);
+    --destructive: oklch(0.577 0.245 27.325);
+    --border: oklch(0.922 0 0);
+    --input: oklch(0.922 0 0);
+    --ring: oklch(0.708 0 0);
+    --chart-1: hsl(12 76% 61%);
+    --chart-2: hsl(173 58% 39%);
+    --chart-3: hsl(197 37% 24%);
+    --chart-4: hsl(43 74% 66%);
+    --chart-5: hsl(27 87% 67%);
+    --sidebar: oklch(0.985 0 0);
+    --sidebar-foreground: oklch(0.145 0 0);
+    --sidebar-primary: oklch(0.205 0 0);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.97 0 0);
+    --sidebar-accent-foreground: oklch(0.205 0 0);
+    --sidebar-border: oklch(0.922 0 0);
+    --sidebar-ring: oklch(0.708 0 0);
+
+    /* Telegram WebApp theme variables */
+    --tg-color-scheme: light;
+    --tg-theme-bg-color: #ffffff;
+    --tg-theme-text-color: #000000;
+    --tg-theme-hint-color: #8e8e93;
+    --tg-theme-link-color: #007aff;
+    --tg-theme-button-color: #007aff;
+    --tg-theme-button-text-color: #ffffff;
+    --tg-theme-secondary-bg-color: #efeff4;
+    --tg-theme-header-bg-color: #f8f8f8;
+    --tg-theme-accent-text-color: #007aff;
+    --tg-theme-section-bg-color: #ffffff;
+    --tg-theme-section-header-text-color: #6d6d72;
+    --tg-theme-subtitle-text-color: #8e8e93;
+    --tg-theme-destructive-text-color: #ff3b30;
+    --tg-theme-section-separator-color: #c8c7cc;
+    --tg-theme-bottom_bar_bg_color: #f2f2f2;
+
+    --tg-accent-green: #2ccb54;
+    --tg-accent-blue: #007aff;
+    --tg-accent-red: #ff3b30;
+    --tg-accent-orange: #ff9500;
+    --tg-accent-violet: #af53d8;
+    --tg-accent-tean-blue: #5ac8fa;
+    --tg-accent-yellow: #ffcc00;
+    --tg-accent-purple: #5856d6;
+    --tg-accent-pink: #ff2d55;
+
+    --tg-safe-area-inset-bottom: 0px;
+    --tg-viewport-height: 698px;
+    --tabbar-height: 56px;
+    --tabbar-current-height: var(--tabbar-height);
+    --min-viewport-height: min(100vh, var(--tg-viewport-height));
+    --viewport-safe-area-inset-bottom: calc(100vh - var(--min-viewport-height, 100vh));
+    --content-safe-area-inset-bottom: calc(var(--viewport-safe-area-inset-bottom, 0px) + var(--tabbar-current-height, 0px));
+    --content-safe-area: calc(100vh - var(--content-safe-area-inset-bottom, 0px));
+}
+
+.dark {
+    /* Telegram WebApp theme variables */
+    --tg-color-scheme: dark;
+    --tg-theme-bg-color: #000000;
+    --tg-theme-text-color: #ffffff;
+    --tg-theme-hint-color: #98989e;
+    --tg-theme-link-color: #3e88f7;
+    --tg-theme-button-color: #3e88f7;
+    --tg-theme-button-text-color: #ffffff;
+    --tg-theme-secondary-bg-color: #1c1c1d;
+    --tg-theme-header-bg-color: #1a1a1a;
+    --tg-theme-accent-text-color: #3e88f7;
+    --tg-theme-section-bg-color: #2c2c2e;
+    --tg-theme-section-header-text-color: #8d8e93;
+    --tg-theme-subtitle-text-color: #98989e;
+    --tg-theme-destructive-text-color: #eb5545;
+    --tg-theme-section-separator-color: #545458;
+    --tg-theme-bottom_bar_bg_color: #1d1d1d;
+
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.205 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.205 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.922 0 0);
+    --primary-foreground: oklch(0.205 0 0);
+    --secondary: oklch(0.269 0 0);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    /*--muted-foreground: oklch(0.708 0 0);*/
+    --muted-foreground: hsl(215.4 16.3% 44%);
+    --accent: oklch(0.269 0 0);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.556 0 0);
+    /*--chart-1: oklch(0.488 0.243 264.376);*/
+    /*--chart-2: oklch(0.696 0.17 162.48);*/
+    /*--chart-3: oklch(0.769 0.188 70.08);*/
+    /*--chart-4: oklch(0.627 0.265 303.9);*/
+    /*--chart-5: oklch(0.645 0.246 16.439);*/
+    --chart-1: hsl(220 70% 50%);
+    --chart-2: hsl(160 60% 45%);
+    --chart-3: hsl(30 80% 55%);
+    --chart-4: hsl(280 65% 60%);
+    --chart-5: hsl(340 75% 55%);
+    --sidebar: hsl(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.488 0.243 264.376);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.556 0 0);
+}
+
+@theme inline {
+    --radius-sm: calc(var(--radius) - 4px);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) + 4px);
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer components {
+    .tg-sticky {
+        position: sticky;
+        top: 0;
+        transform: translateZ(0);
+        backface-visibility: hidden;
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border outline-ring/50;
+    }
+
+    body {
+        @apply bg-background text-foreground;
+    }
+}
+
+@layer utilities {
+    /* Скрываем скроллбар везде */
+    ::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        background: transparent;
+    }
+
+    html {
+        height: 100%;
+        overflow: hidden;
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        height: 100%;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #root {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        min-height: -webkit-fill-available;
+        position: relative;
+    }
+
+    .content-wrapper {
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+
+        flex: 1 1 auto;
+        box-sizing: border-box;
+        padding-bottom: calc(50px + var(--tg-safe-area-inset-bottom)); /* Отступ = высота меню + safe area */
+    }
+
+    .content {
+        height: 100%;
+        overflow: auto;
+    }
+
+    .menu-container {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        min-height: calc(50px + var(--tg-safe-area-inset-bottom)); /* Учитываем чёлку в высоте */
+        padding-bottom: var(--tg-safe-area-inset-bottom); /* Отступ под иконками */
+        /*z-index: 1000;*/
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+    }
+
+    .bg-tg-theme-bg-color {
+        background-color: var(--tg-theme-bg-color);
+    }
+
+    .bg-tg-theme-secondary-bg-color {
+        background-color: var(--tg-theme-secondary-bg-color);
+    }
+
+    .bg-tg-theme-section-bg-color {
+        background-color: var(--tg-theme-section-bg-color);
+    }
+
+    .text-tg-theme-text-color {
+        color: var(--tg-theme-text-color);
+    }
+
+    .text-tg-theme-hint-color {
+        color: var(--tg-theme-hint-color);
+    }
+
+    .text-tg-theme-subtitle-text-color {
+        color: var(--tg-theme-subtitle-text-color);
+    }
+
+    .text-tg-theme-link-color {
+        color: var(--tg-theme-link-color);
+    }
+
+    .border-tg-theme-button-color {
+        border-color: var(--tg-theme-button-color);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 0.15s ease-out forwards;
+    }
+
+    .bg-tg-theme-button-color {
+        background-color: var(--tg-theme-button-color);
+    }
+
+    .bg-tg-theme-button-color-transparent {
+        background-color: rgb(from var(--tg-theme-button-color) r g b / 20%);
+    }
+
+    .bg-tg-theme-destructive-color {
+        background-color: var(--tg-theme-destructive-text-color);
+    }
+
+    .text-tg-theme-button-color {
+        color: var(--tg-theme-button-color);
+    }
+
+    .text-tg-theme-button-text-color {
+        color: var(--tg-theme-button-text-color);
+    }
+
+    .border-tg-theme-section-separator-color {
+        border-color: var(--tg-theme-section-separator-color);
+    }
+
+    .text-theme-section-header-text-color {
+        color: var(--tg-theme-section-header-text-color);
+    }
+
+    .no-scrollbar {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none !important; /* Firefox */
+    }
+
+    .badge-primary {
+        background-color: var(--tg-theme-accent-text-color);
+        color: var(--tg-theme-button-text-color);
+    }
+
+    .separator-shadow-top {
+        box-shadow: 0 -1px 0 rgb(from var(--tg-theme-section-separator-color) r g b / 60%);
+        box-shadow: 0 -.5px 0 rgb(from var(--tg-theme-section-separator-color) r g b / 60%);
+    }
+
+    .separator-shadow-bottom {
+        box-shadow: inset 0 -1px 0 rgb(from var(--tg-theme-section-separator-color) r g b / 60%);
+        box-shadow: inset 0 -.5px 0 rgb(from var(--tg-theme-section-separator-color) r g b / 60%);
+    }
+
+    html body[data-scroll-locked] {
+        position: initial !important;
+    }
+
+    .quaternary-fill-background {
+        background-color: var(--quaternary-fill-background);
+    }
+
+    .tg-input-border {
+        border: .5px solid var(--tg-theme-section-separator-color);
+    }
+
+    .root-bg-color {
+        background-color: var(--tg-theme-secondary-bg-color);
+    }
+
+    .root-bg-color-transparency {
+        background-color: rgb(from var(--tg-theme-bg-color) r g b / 90%);
+    }
+
+    .card-bg-color {
+        background-color: var(--tg-theme-section-bg-color);
+    }
+
+    [data-sonner-toast][data-styled=true]{
+        border: none !important;
+        background-color: rgb(from var(--tg-theme-secondary-bg-color) r g b / 90%) !important;
+        color: var(--tg-theme-text-color) !important;
+        backdrop-filter: blur(5px);
+        border-radius: calc(var(--radius) + 4px);
+    }
+
+    .card-bg-color-transparency {
+        background-color: rgb(from var(--tg-theme-bottom_bar_bg_color) r g b / 90%);
+    }
+
+    .dark {
+        .root-bg-color {
+            background-color: var(--tg-theme-bg-color);
+        }
+
+        .card-bg-color {
+            background-color: var(--tg-theme-secondary-bg-color);
+        }
+
+        [data-sonner-toast][data-styled=true]{
+            border: none !important;
+            background-color: rgb(from var(--tg-theme-secondary-bg-color) r g b / 90%) !important;
+            color: var(--tg-theme-text-color) !important;
+            backdrop-filter: blur(5px);
+            border-radius: calc(var(--radius) + 4px);
+        }
+
+        .card-bg-color-transparency {
+            background-color: rgb(from var(--tg-theme-bottom_bar_bg_color) r g b / 90%);
+        }
+    }
+
+    .lucide-star {
+        --fill-color: #FFD700; /* Цвет заливки */
+        --stroke-color: #FFD700; /* Цвет обводки */
+
+        /* Переопределяем fill для всего SVG */
+        fill: var(--fill-color) !important;
+
+        /* Переопределяем stroke */
+        stroke: var(--stroke-color) !important;
+    }
+
+    /* Дополнительно для path внутри SVG */
+    .lucide-star path {
+        fill: inherit !important;
+        stroke: inherit !important;
+    }
+
+    [data-sonner-toast][data-y-position=bottom]{
+        bottom: calc(50px + var(--tg-safe-area-inset-bottom)) !important;
+    }
+}

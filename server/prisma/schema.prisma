@@ -1,0 +1,236 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model Address {
+  id          Int     @id @default(autoincrement())
+  userId      String?
+  name        String
+  fullAddress String
+  comments    String?
+}
+
+enum OrderStatus {
+  // Готов к работе
+  todo
+  // Выполняется
+  processed
+  // Завершен
+  completed
+  // Отменен
+  canceled
+}
+
+model Order {
+  id               Int             @id @default(autoincrement())
+  startedAt        DateTime? // Время начала работы исполнителя
+  completedAt      DateTime? // Время окончания работы исполнителя
+  baseService      BaseService     @relation(fields: [baseServiceId], references: [id])
+  baseServiceId    Int
+  serviceVariant   ServiceVariant  @relation(fields: [serviceVariantId], references: [id])
+  serviceVariantId Int
+  options          ServiceOption[]
+  status           OrderStatus     @default(todo)
+  fullAddress      String
+  date             DateTime        @db.Timestamp(6)
+  userId           String?
+  executor         User?           @relation(fields: [executorId], references: [id])
+  executorId       String?
+  comment          String?
+  bonus            Int?
+}
+
+model BaseService {
+  id Int @id @default(autoincrement())
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+  deletedAt DateTime?
+
+  name      String
+  variants  ServiceVariant[]
+  options   ServiceOption[]
+  orders    Order[]
+  keywords  Keyword[]
+  executors ServiceExecutors[] // Добавляем обратное отношение
+}
+
+model ServiceVariant {
+  id             Int                   @id @default(autoincrement())
+  name           String
+  nameAccusative String                @default("") // "генеральную уборку"
+  icon           String?
+  basePrice      Int
+  duration       Int
+  baseService    BaseService           @relation(fields: [baseServiceId], references: [id])
+  baseServiceId  Int
+  orders         Order[]
+  keywords       Keyword[]
+  variants       ApplicationVariants[] // Связь с выбранными вариантами услуг
+}
+
+model ServiceOption {
+  id            Int         @id @default(autoincrement())
+  name          String
+  price         Int
+  description   String?
+  duration      Int
+  isPopular     Boolean     @default(false)
+  baseService   BaseService @relation(fields: [baseServiceId], references: [id])
+  baseServiceId Int
+  orders        Order[]
+}
+
+model User {
+  id              String             @id
+  createdAt       DateTime           @default(now())
+  firstName       String
+  lastName        String?
+  photoUrl        String?
+  username        String?
+  refId           String?
+  phone           String?
+  services        ServiceExecutors[] // Обратное отношение
+  orders          Order[] // Обратное отношение
+  bonusOperations BonusOperation[]
+  scheduleDays    ScheduleDay[]
+  application     Application? // 1-to-1 связь
+  isAdmin         Boolean            @default(false) // Возможность стать админом
+  chat            Chat?
+}
+
+model Keyword {
+  id        Int             @id @default(autoincrement())
+  value     String          @unique
+  service   BaseService     @relation(fields: [serviceId], references: [id])
+  serviceId Int
+  variant   ServiceVariant? @relation(fields: [variantId], references: [id])
+  variantId Int?
+}
+
+model ServiceExecutors {
+  service   BaseService @relation(fields: [serviceId], references: [id])
+  serviceId Int
+  user      User        @relation(fields: [userId], references: [id])
+  userId    String
+
+  @@id([serviceId, userId]) // Составной первичный ключ
+  @@index([userId]) // Дополнительный индекс
+}
+
+enum DayOfWeek {
+  MON
+  TUE
+  WED
+  THU
+  FRI
+  SAT
+  SUN
+}
+
+model ScheduleDay {
+  id        Int        @id @default(autoincrement())
+  dayOfWeek DayOfWeek
+  isDayOff  Boolean    @default(false)
+  timeSlots TimeSlot[]
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+
+  @@unique([userId, dayOfWeek])
+}
+
+model TimeSlot {
+  id            Int         @id @default(autoincrement())
+  time          DateTime    @db.Time(6) // Храним только время
+  scheduleDay   ScheduleDay @relation(fields: [scheduleDayId], references: [id], onDelete: Cascade)
+  scheduleDayId Int
+
+  @@unique([scheduleDayId, time]) // Уникальная комбинация дня и времени
+}
+
+model Application {
+  id              Int                   @id @default(autoincrement())
+  user            User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String                @unique // 1-to-1 связь
+  status          ApplicationStatus     @default(PENDING)
+  rejectionReason String?
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  variants        ApplicationVariants[] // Связь с выбранными вариантами услуг
+}
+
+model ApplicationVariants {
+  application   Application    @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  applicationId Int
+  variant       ServiceVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  variantId     Int
+
+  @@id([applicationId, variantId]) // Составной первичный ключ
+}
+
+enum ApplicationStatus {
+  PENDING // На модерации
+  APPROVED // Одобрено
+  REJECTED // Отклонено
+}
+
+model BonusOperation {
+  id          Int                @id @default(autoincrement())
+  createdAt   DateTime           @default(now())
+  value       Int
+  type        BonusOperationType
+  description String?
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+}
+
+enum BonusOperationType {
+  GIFT // Подарок
+  INVITE // Приглашение друга
+  ORDER // % за заказ
+  WITHDRAWAL // Списание бонусов
+}
+
+enum MessageFrom {
+  client
+  support
+}
+
+model Chat {
+  id   String @id
+  name String
+
+  user User @relation(fields: [id], references: [id], onDelete: Cascade)
+
+  messages Message[]
+
+  // Начать диалог или нет
+  isStarted Boolean @default(false)
+
+  // False - Диалог прочитан, true - есть новые сообщения
+  isUnread Boolean @default(false)
+}
+
+
+enum MessageType {
+  TEXT
+  PHOTO
+  SYSTEM
+}
+model Message {
+  text String
+  from MessageFrom
+  id   Int         @id
+  date Int
+
+  chat   Chat   @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  chatId String
+  type MessageType @default(TEXT)
+}
