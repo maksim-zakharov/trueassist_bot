@@ -1,6 +1,6 @@
 {
   "name": "client",
-  "homepage": "https://maksim-zakharov.github.io/qlean-clone",
+  "homepage": "https://maksim-zakharov.github.io/trueassist_bot",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -8,7 +8,7 @@
     "client:dev": "vite",
     "client:dev-host": "vite --host",
     "build": "vite build",
-    "build:ci": "vite build --base=/qlean-clone",
+    "build:ci": "vite build --base=/trueassist_bot",
     "preview": "vite preview",
     "predeploy": "vite build",
     "deploy": "gh-pages -d dist"
