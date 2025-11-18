@@ -54,7 +54,7 @@ export const OrderCheckoutPage = () => {
         } else
             navigate(RoutePaths.Order.List)
     });
-    
+
     const [comment, setComment] = useState<string | undefined>();
     const {vibro} = useTelegram();
     const {data: addresses = []} = useGetAddressesQuery();
@@ -143,62 +143,63 @@ export const OrderCheckoutPage = () => {
                     </CommentsSheet>
                 </ListButtonGroup>
 
-                <div>
-                    <Typography.Description
-                        className="block mb-2 text-left pl-4 text-sm uppercase">Bonuses</Typography.Description>
-                    <Card className="p-3 px-4 pb-7">
-                        <div className="grid grid-cols-3">
-                            <Typography.Description
-                                className="block mb-2 text-left text-md uppercase">0</Typography.Description>
-                            <span
-                                className="text-tg-theme-text-color text-center">{moneyFormat(bonus)}</span>
-                            <Typography.Description
-                                className="block mb-2 text-md uppercase text-right">{moneyFormat(maxBonus)}</Typography.Description>
-                        </div>
-                        <Slider max={maxBonus} step={50} value={[bonus]} onValueChange={handleOnSelectBonuses} />
-                    </Card>
-                </div>
+                {/* убрать отображение цен */}
+                {/*<div>*/}
+                {/*    <Typography.Description*/}
+                {/*        className="block mb-2 text-left pl-4 text-sm uppercase">Bonuses</Typography.Description>*/}
+                {/*    <Card className="p-3 px-4 pb-7">*/}
+                {/*        <div className="grid grid-cols-3">*/}
+                {/*            <Typography.Description*/}
+                {/*                className="block mb-2 text-left text-md uppercase">0</Typography.Description>*/}
+                {/*            <span*/}
+                {/*                className="text-tg-theme-text-color text-center">{moneyFormat(bonus)}</span>*/}
+                {/*            <Typography.Description*/}
+                {/*                className="block mb-2 text-md uppercase text-right">{moneyFormat(maxBonus)}</Typography.Description>*/}
+                {/*        </div>*/}
+                {/*        <Slider max={maxBonus} step={50} value={[bonus]} onValueChange={handleOnSelectBonuses} />*/}
+                {/*    </Card>*/}
+                {/*</div>*/}
 
                 {/* Order Summary */}
-                {baseService && <Accordion
-                    type="single"
-                    collapsible
-                    defaultValue="services"
-                    onValueChange={() => vibro()}
-                >
-                    <AccordionItem value="services">
-                        <AccordionTrigger disabled={!options.length}>
-                            <div className="flex justify-between w-full">
-                                <span className="text-lg font-medium text-tg-theme-text-color">{t('client_order_details_services_summary')}</span>
-                                <div className="flex items-center gap-1 pr-2">
-                                        <span
-                                            className="text-lg font-medium text-tg-theme-text-color">{moneyFormat(totalWithBonus)}</span>
-                                </div>
-                            </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="flex flex-col gap-2">
-                            <div key={baseService?.id} className="flex justify-between">
-                                <span className="text-tg-theme-text-color">{baseService?.name}</span>
-                                <span
-                                    className="text-tg-theme-text-color">{moneyFormat(serviceVariant?.basePrice)}</span>
-                            </div>
-                            {options.map((service, index) => (
-                                <div key={index} className="flex justify-between">
-                                    <span className="text-tg-theme-text-color">{service.name}</span>
-                                    <span
-                                        className="text-tg-theme-text-color">{moneyFormat(service.price)}</span>
-                                </div>
-                            ))}
-                            {Boolean(bonus) && <div key="bonus" className="flex justify-between">
-                                <span className="text-tg-theme-text-color">Bonus</span>
-                                <span
-                                    className="text-tg-theme-text-color">{moneyFormat(-bonus)}</span>
-                            </div>}
-                        </AccordionContent>
-                    </AccordionItem>
-                </Accordion>}
+                {/*{baseService && <Accordion*/}
+                {/*    type="single"*/}
+                {/*    collapsible*/}
+                {/*    defaultValue="services"*/}
+                {/*    onValueChange={() => vibro()}*/}
+                {/*>*/}
+                {/*    <AccordionItem value="services">*/}
+                {/*        <AccordionTrigger disabled={!options.length}>*/}
+                {/*            <div className="flex justify-between w-full">*/}
+                {/*                <span className="text-lg font-medium text-tg-theme-text-color">{t('client_order_details_services_summary')}</span>*/}
+                {/*                <div className="flex items-center gap-1 pr-2">*/}
+                {/*                        <span*/}
+                {/*                            className="text-lg font-medium text-tg-theme-text-color">{moneyFormat(totalWithBonus)}</span>*/}
+                {/*                </div>*/}
+                {/*            </div>*/}
+                {/*        </AccordionTrigger>*/}
+                {/*        <AccordionContent className="flex flex-col gap-2">*/}
+                {/*            <div key={baseService?.id} className="flex justify-between">*/}
+                {/*                <span className="text-tg-theme-text-color">{baseService?.name}</span>*/}
+                {/*                <span*/}
+                {/*                    className="text-tg-theme-text-color">{moneyFormat(serviceVariant?.basePrice)}</span>*/}
+                {/*            </div>*/}
+                {/*            {options.map((service, index) => (*/}
+                {/*                <div key={index} className="flex justify-between">*/}
+                {/*                    <span className="text-tg-theme-text-color">{service.name}</span>*/}
+                {/*                    <span*/}
+                {/*                        className="text-tg-theme-text-color">{moneyFormat(service.price)}</span>*/}
+                {/*                </div>*/}
+                {/*            ))}*/}
+                {/*            {Boolean(bonus) && <div key="bonus" className="flex justify-between">*/}
+                {/*                <span className="text-tg-theme-text-color">Bonus</span>*/}
+                {/*                <span*/}
+                {/*                    className="text-tg-theme-text-color">{moneyFormat(-bonus)}</span>*/}
+                {/*            </div>}*/}
+                {/*        </AccordionContent>*/}
+                {/*    </AccordionItem>*/}
+                {/*</Accordion>}*/}
 
-                <EstimatedTime totalDuration={totalDuration}/>
+                {/*<EstimatedTime totalDuration={totalDuration}/>*/}
 
                 {/* Promo Code */}
                 {/*<Button*/}
@@ -231,4 +232,4 @@ export const OrderCheckoutPage = () => {
             </BottomActions>
         </>
     )
-} 
+}
