@@ -19,6 +19,32 @@ interface ScheduleSheetProps {
     optionIds?: number[];
 }
 
+
+function generateHourlySlotsForDay(dayTimestamp: number, intervalHours: number = 1): number[] {
+    const now = dayjs();
+    const threeHoursFromNow = now.add(3, 'hour');
+
+    // Начало дня (00:00)
+    const startOfDay = dayjs(dayTimestamp).startOf('day');
+    // Конец дня (23:59)
+    const endOfDay = dayjs(dayTimestamp).endOf('day');
+
+    const slots: number[] = [];
+    let currentSlot = startOfDay;
+
+    // Генерируем слоты с интервалом в intervalHours часов
+    while (currentSlot.isBefore(endOfDay) || currentSlot.isSame(endOfDay)) {
+        // Проверяем, что слот не раньше чем через 3 часа от текущего времени
+        if (currentSlot.isAfter(threeHoursFromNow)) {
+            slots.push(currentSlot.valueOf());
+        }
+
+        currentSlot = currentSlot.add(intervalHours, 'hour');
+    }
+
+    return slots;
+}
+
 export function ScheduleSheet({
                                   children,
                                   selectedTimestamp,
@@ -49,22 +75,30 @@ export function ScheduleSheet({
         const inputDateUTC = dayjs(date).startOf('day');
 
         // Если дата раньше текущей UTC даты
-        if(inputDateUTC.isBefore(todayUTC) || !availableDatesSet.size) {
-            return true;
-        }
+        return inputDateUTC.isBefore(todayUTC);
+
+        // // Если дата раньше текущей UTC даты
+        // if(inputDateUTC.isBefore(todayUTC) || !availableDatesSet.size) {
+        //     return true;
+        // }
 
         // Сравниваем timestamp начала дня в UTC
         const value = inputDateUTC.valueOf();
         return !availableDatesSet.has(value);
     }, [availableDatesSet]);
 
-    const {data: availableSlots = [], isFetching} = useGetExecutorAvailableSlotsQuery({
-        date: dayjs(tab).format('YYYY-MM-DD'),
-        serviceVariantId,
-        optionIds
-    }, {
-        skip: !tab || !serviceVariantId || !optionIds
-    });
+    //  изменить выбор времени и даты заказа на свободный (вместо слотов)
+    // const {data: availableSlots = [], isFetching} = useGetExecutorAvailableSlotsQuery({
+    //     date: dayjs(tab).format('YYYY-MM-DD'),
+    //     serviceVariantId,
+    //     optionIds
+    // }, {
+    //     skip: !tab || !serviceVariantId || !optionIds
+    // });
+
+    const isFetching = false;
+
+    const availableSlots = generateHourlySlotsForDay(dayjs(tab).valueOf()).map(timestamp => ({timestamp}));
 
     const filteredSlots = useMemo(() => availableSlots.filter(sl => dayjs.utc(sl.timestamp).valueOf() > dayjs.utc().valueOf()).map(sl => ({...sl, time: dayjs.utc(sl.timestamp).local().format('HH:mm')})).sort((a, b) => a.time.localeCompare(b.time)), [availableSlots]);
 
@@ -104,7 +138,7 @@ export function ScheduleSheet({
                           mode="single"
                           selected={tab}
                           onSelect={setTab}
-                          disabled={isPastDate}
+                          disabled={isPastDate} // изменить выбор времени и даты заказа на свободный
                           required={false}
                 />
                 {isFetching && <div className="grid grid-cols-3 gap-2 overflow-x-auto no-scrollbar">
@@ -152,4 +186,4 @@ export function ScheduleSheet({
             </SheetContent>
         </Sheet>
     )
-} 
+}
