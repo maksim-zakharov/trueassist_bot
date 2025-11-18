@@ -150,7 +150,7 @@ export const ExecutorOrdersPage = () => {
                         <div className="p-3 px-0 flex flex-col w-full">
                             <div className="flex justify-between">
                                 <Typography.Title>{ao.baseService?.name}</Typography.Title>
-                                <Typography.Title>{moneyFormat(ao.serviceVariant?.basePrice + ao.options.reduce((acc, curr) => acc + curr?.price, 0))}</Typography.Title>
+                                {/*<Typography.Title>{moneyFormat(ao.serviceVariant?.basePrice + ao.options.reduce((acc, curr) => acc + curr?.price, 0))}</Typography.Title>*/}
                             </div>
                             <div className="flex justify-between">
                                 <Typography.Description>{ao.fullAddress}</Typography.Description>
@@ -164,8 +164,8 @@ export const ExecutorOrdersPage = () => {
                             {ao.options.map((service, index) => (
                                 <div key={index} className="flex justify-between">
                                     <span className="text-xs text-tg-theme-hint-color font-medium">{service.name}</span>
-                                    <span
-                                        className="text-xs text-tg-theme-hint-color font-medium">{formatDuration(service.duration)}</span>
+                                    {/*<span*/}
+                                    {/*    className="text-xs text-tg-theme-hint-color font-medium">{formatDuration(service.duration)}</span>*/}
                                 </div>
                             ))}
                             {ao.status === 'processed' &&
