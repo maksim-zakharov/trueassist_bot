@@ -32,6 +32,17 @@ export const ExecutorOrdersPage = () => {
         hideBackButton()
     }, [hideBackButton]);
 
+    const tabs = [
+        {
+            key: 'active',
+            label: 'Active'
+        },
+        {
+            key: 'archive',
+            label: 'Archive'
+        }
+    ]
+
     const {data: orders = [], isLoading, isError} = useGetExecutorOrdersQuery(undefined, {
         refetchOnMountOrArgChange: true
     });
@@ -69,7 +80,7 @@ export const ExecutorOrdersPage = () => {
 
     const [searchParams, setSearchParams] = useSearchParams();
     const tab = searchParams.get('tab') || result[0]?.timestamp.toString();
-    const filteredOrders = useMemo(() => orders.filter(o => !['completed', 'canceled'].includes(o.status) && dayjs.utc(o.date).startOf('day').unix() === dayjs.utc(Number(tab)).startOf('day').unix()).sort((a, b) => a.date.localeCompare(b.date)), [orders, tab]);
+    const filteredOrders = useMemo(() => orders.filter(o => (tab === 'active' ? !['completed', 'canceled'].includes(o.status) :  ['completed', 'canceled'].includes(o.status))).sort((a, b) => a.date.localeCompare(b.date)), [orders, tab]);
     const activeOrders = useMemo(() => filteredOrders.filter(o => o.status === 'processed').sort((a, b) => b.id - a.id), [filteredOrders]);
 
     const handleFinishOrder = async (order) => {
@@ -114,12 +125,12 @@ export const ExecutorOrdersPage = () => {
     return <div className="flex flex-col">
         <Header className="p-0">
             <Tabs defaultValue={tab} onValueChange={onChangeTab} className="px-4 h-full">
-                <TabsList className="bg-inherit px-0 h-full">
-                    {result.map(r => <TabsTrigger
-                        key={r.timestamp}
-                        value={r.timestamp.toString()}
+                <TabsList className="bg-inherit px-0 h-full grid grid-cols-2">
+                    {tabs.map(r => <TabsTrigger
+                        key={r.key}
+                        value={r.key}
                     >
-                        {r.date}
+                        {r.label}
                     </TabsTrigger>)}
                 </TabsList>
             </Tabs>
