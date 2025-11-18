@@ -127,14 +127,14 @@ export const OrderCreationPage: FC<{isAdmin?: boolean}> = ({isAdmin}) => {
                                         className="w-3 h-3"/>{t('client_creation_popular_label')}</Badge>
                                 ) : <div/>}
                             </div>
-                            <span
-                                className="text-[15px] font-normal text-tg-theme-text-color whitespace-nowrap">{moneyFormat(option.price)}</span>
+                            {/*<span*/}
+                            {/*    className="text-[15px] font-normal text-tg-theme-text-color whitespace-nowrap">{moneyFormat(option.price)}</span>*/}
                             <Checkbox checked={selectedOptionsIdSet.has(option.id)}
                                       onCheckedChange={() => handleOptionToggle(option)}/>
                         </div>
                     </>)}
                 </List>
-                <EstimatedTime totalDuration={totalDuration}/>
+                {/*<EstimatedTime totalDuration={totalDuration}/>*/}
             </div>
 
             <BottomActions className="[padding-bottom:var(--tg-safe-area-inset-bottom)]">
@@ -144,8 +144,8 @@ export const OrderCreationPage: FC<{isAdmin?: boolean}> = ({isAdmin}) => {
                     loading={patchOrderLoading}
                     size="lg"
                 ><span
-                    className="flex-1 text-left">{isDraft ? t('client_creation_continue_btn') : t('client_creation_save_btn')}</span>
-                    <span>{moneyFormat(totalPrice)}</span>
+                    className="flex-1 text-center">{isDraft ? t('client_creation_continue_btn') : t('client_creation_save_btn')}</span>
+                    {/*<span>{moneyFormat(totalPrice)}</span>*/}
                 </Button>
             </BottomActions>
         </>
