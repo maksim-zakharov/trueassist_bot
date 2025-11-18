@@ -79,7 +79,7 @@ export const ExecutorOrdersPage = () => {
     }).filter(s => s.slots.length > 0), []);
 
     const [searchParams, setSearchParams] = useSearchParams();
-    const tab = searchParams.get('tab') || result[0]?.timestamp.toString();
+    const tab = searchParams.get('tab') || 'active'; // result[0]?.timestamp.toString();
     const filteredOrders = useMemo(() => orders.filter(o => (tab === 'active' ? !['completed', 'canceled'].includes(o.status) :  ['completed', 'canceled'].includes(o.status))).sort((a, b) => a.date.localeCompare(b.date)), [orders, tab]);
     const activeOrders = useMemo(() => filteredOrders.filter(o => o.status === 'processed').sort((a, b) => b.id - a.id), [filteredOrders]);
 
