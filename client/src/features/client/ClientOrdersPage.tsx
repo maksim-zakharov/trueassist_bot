@@ -89,7 +89,8 @@ export const ClientOrdersPage = () => {
                     <div className="p-3 pl-0 separator-shadow-bottom">
                         <div className="flex justify-between">
                             <Typography.Title>{ao.baseService?.name}</Typography.Title>
-                            <Typography.Title>{moneyFormat(ao.serviceVariant?.basePrice + ao.options.reduce((acc, curr) => acc + curr?.price, -ao.bonus || 0))}</Typography.Title>
+                            <Typography.Title><OrderStatusText status={ao.status}/></Typography.Title>
+                            {/*<Typography.Title>{moneyFormat(ao.serviceVariant?.basePrice + ao.options.reduce((acc, curr) => acc + curr?.price, -ao.bonus || 0))}</Typography.Title>*/}
                         </div>
                         <div className="flex justify-between">
                             <Typography.Description>{ao.fullAddress}</Typography.Description>
@@ -99,7 +100,7 @@ export const ClientOrdersPage = () => {
                     <div className="p-3 pl-0 flex gap-2 flex-col">
                         <div className="flex justify-between">
                             <Typography.Title>№{ao.id}</Typography.Title>
-                            <Typography.Title><OrderStatusText status={ao.status}/></Typography.Title>
+                            {/*<Typography.Title><OrderStatusText status={ao.status}/></Typography.Title>*/}
                         </div>
                         <div className="flex justify-between align-bottom items-center">
                             <Button className="p-0 border-none h-6" onClick={(e) => handleAddOptionClick(e, ao)}
