@@ -3,7 +3,6 @@ import React, {useCallback, useMemo, useRef, useState} from "react";
 import {CardItem} from "./CardItem.tsx";
 import {useTelegram} from "../hooks/useTelegram.tsx";
 import dayjs from "dayjs";
-import {useGetAvailableDatesQuery, useGetExecutorAvailableSlotsQuery} from "../api/api.ts";
 import {EmptyState} from "./EmptyState.tsx";
 import {CalendarX} from "lucide-react";
 import {Skeleton} from "./ui/skeleton.tsx";
@@ -15,7 +14,7 @@ import {Button} from "./ui/button.tsx";
 interface ScheduleSheetProps {
     selectedTimestamp?: number;
     onSelectDate: (date: number) => void;
-    serviceVariantId: number;
+    serviceVariantId?: number;
     optionIds?: number[];
 }
 
@@ -58,14 +57,14 @@ export function ScheduleSheet({
 
     const [tab, setTab] = useState<Date | undefined>(dayjs.utc().startOf('day').toDate());
 
-    const {data: availableDates = []} = useGetAvailableDatesQuery({
-        optionIds,
-        serviceVariantId
-    }, {
-        skip: !serviceVariantId || !optionIds
-    })
+    // const {data: availableDates = []} = useGetAvailableDatesQuery({
+    //     optionIds,
+    //     serviceVariantId
+    // }, {
+    //     skip: !serviceVariantId || !optionIds
+    // })
 
-    const availableDatesSet = useMemo(() => new Set(availableDates.map(formattedDate => dayjs(formattedDate).valueOf()) || []), [availableDates]);
+    // const availableDatesSet = useMemo(() => new Set(availableDates.map(formattedDate => dayjs(formattedDate).valueOf()) || []), [availableDates]);
 
     const isPastDate = useCallback((date: Date) => {
         // Получаем текущую дату в UTC и обнуляем время
@@ -83,9 +82,9 @@ export function ScheduleSheet({
         // }
 
         // Сравниваем timestamp начала дня в UTC
-        const value = inputDateUTC.valueOf();
-        return !availableDatesSet.has(value);
-    }, [availableDatesSet]);
+        // const value = inputDateUTC.valueOf();
+        // return !availableDatesSet.has(value);
+    }, []);
 
     //  изменить выбор времени и даты заказа на свободный (вместо слотов)
     // const {data: availableSlots = [], isFetching} = useGetExecutorAvailableSlotsQuery({

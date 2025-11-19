@@ -1,10 +1,9 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useState} from "react";
 import {Typography} from "../../components/ui/Typography.tsx";
 import {Button} from "../../components/ui/button.tsx";
 import {useCompleteOrderMutation, useGetExecutorOrdersQuery} from "../../api/ordersApi.ts";
 import dayjs from "dayjs";
-import {CalendarCheck, ClipboardPlus} from "lucide-react";
-import {moneyFormat} from "../../lib/utils.ts";
+import {Calendar, CalendarCheck, ClipboardPlus, X} from "lucide-react";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import {Skeleton} from "../../components/ui/skeleton.tsx";
 import {EmptyState} from "../../components/EmptyState.tsx";
@@ -12,7 +11,6 @@ import {Tabs, TabsList, TabsTrigger} from "../../components/ui/tabs.tsx";
 import {Header} from "../../components/ui/Header.tsx";
 
 
-import {formatDuration} from "../../components/EstimatedTime.tsx";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "../../components/ui/accordion.tsx";
 import {useTelegram} from "../../hooks/useTelegram.tsx";
 import {AlertDialogWrapper} from "../../components/AlertDialogWrapper.tsx";
@@ -20,13 +18,24 @@ import {toast} from "sonner";
 import {RoutePaths} from "../../routes.ts";
 import {useTranslation} from "react-i18next";
 import {ErrorState} from "../../components/ErrorState.tsx";
+import {ListButton} from "../../components/ListButton/ListButton.tsx";
+import {CalendarSheet} from "../../components/CalendarSheet.tsx";
 
 export const ExecutorOrdersPage = () => {
+    const [selectedTimestamp, handleSelectDate] = useState<Date | undefined>();
     const {t} = useTranslation();
     const [completeOrder, {isLoading: completeOrderLoading}] = useCompleteOrderMutation();
     const navigate = useNavigate()
     const [orderToDelete, setOrderToDelete] = useState<any | null>(null);
     const {vibro, hideBackButton} = useTelegram();
+
+    const dateTitle = useMemo(() => {
+        if (!selectedTimestamp) {
+            return t('client_checkout_date_placeholder');
+        }
+
+        return dayjs.utc(selectedTimestamp).local().format('dddd, D MMMM');
+    }, [selectedTimestamp, t]);
 
     useEffect(() => {
         hideBackButton()
@@ -47,40 +56,12 @@ export const ExecutorOrdersPage = () => {
         refetchOnMountOrArgChange: true
     });
 
-    function generateTimeSlots(parentDate) {
-        const slots = [];
-        const start = parentDate.startOf('day').add(8, 'hour');
-        const end = parentDate.startOf('day').add(22, 'hour');
-
-        let current = start;
-
-        while (current.isBefore(end)) {
-            const slotStart = current;
-            const slotEnd = current.add(30, 'minute');
-
-            slots.push({
-                timestamp: slotStart.valueOf(),
-                time: slotStart.format('HH:mm')
-            });
-
-            current = slotEnd;
-        }
-
-        return slots.filter(s => dayjs.utc(s.timestamp).isAfter(dayjs.utc()) || dayjs.utc(s.timestamp).isSame(dayjs.utc()));
-    }
-
-    const result = useMemo(() => Array.from({length: 7}, (_, i) => {
-        const date = dayjs.utc().add(i, 'day').startOf('day');
-        return {
-            date: date.locale('en').format('dd, D MMM').toLowerCase(),
-            timestamp: date.valueOf(),
-            slots: generateTimeSlots(date)
-        };
-    }).filter(s => s.slots.length > 0), []);
-
     const [searchParams, setSearchParams] = useSearchParams();
     const tab = searchParams.get('tab') || 'active'; // result[0]?.timestamp.toString();
-    const filteredOrders = useMemo(() => orders.filter(o => (tab === 'active' ? !['completed', 'canceled'].includes(o.status) :  ['completed', 'canceled'].includes(o.status))).sort((a, b) => a.date.localeCompare(b.date)), [orders, tab]);
+    const filteredOrders = useMemo(() => orders
+            .filter(o => (tab === 'active' ? !['completed', 'canceled'].includes(o.status) : ['completed', 'canceled'].includes(o.status) && (!selectedTimestamp || dayjs(o.date).startOf('day').isSame(dayjs(selectedTimestamp).startOf('day')))))
+            .sort((a, b) => b.date.localeCompare(a.date))
+        , [orders, tab, selectedTimestamp]);
     const activeOrders = useMemo(() => filteredOrders.filter(o => o.status === 'processed').sort((a, b) => b.id - a.id), [filteredOrders]);
 
     const handleFinishOrder = async (order) => {
@@ -98,6 +79,17 @@ export const ExecutorOrdersPage = () => {
         searchParams.set('tab', tab);
         setSearchParams(searchParams);
     }
+
+    const isPastDate = useCallback((date: Date) => {
+        // Получаем текущую дату в UTC и обнуляем время
+        const todayUTC = dayjs().startOf('day');
+
+        // Конвертируем входную дату в UTC и обнуляем время
+        const inputDateUTC = dayjs(date).startOf('day');
+
+        // Если дата раньше текущей UTC даты
+        return inputDateUTC.isAfter(todayUTC);
+    }, []);
 
     if (isLoading) {
         return <div>
@@ -135,6 +127,18 @@ export const ExecutorOrdersPage = () => {
                 </TabsList>
             </Tabs>
         </Header>
+        {tab === 'archive' && <div className="ml-3 mr-3 mt-2">
+            <CalendarSheet disabled={isPastDate} selectedTimestamp={selectedTimestamp} onSelectDate={handleSelectDate}
+            >
+                <ListButton icon={<Calendar
+                    className="p-1 h-7 w-7 bg-[#2AABEE] rounded-md"/>} text={dateTitle}
+                            extra={selectedTimestamp && <X onClick={(e) => {
+                                e.stopPropagation()
+                                handleSelectDate(undefined)
+                            }}
+                                                           className="w-5 h-5 text-tg-theme-hint-color mr-[-8px] opacity-50"/>}/>
+            </CalendarSheet>
+        </div>}
         <div className="flex flex-col gap-4 py-4">
             {filteredOrders.length === 0 && <EmptyState className="flex justify-center h-screen items-center m-auto"
                                                         icon={<ClipboardPlus className="h-10 w-10"/>}
