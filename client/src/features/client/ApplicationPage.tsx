@@ -108,7 +108,7 @@ export const ApplicationPage = () => {
                 <br/> {t('create_application_rejected_description_2')}</Typography.Title>
             <Button onClick={() => navigate(RoutePaths.Profile)}>{t('create_application_profile_btn')}</Button>
             <Button variant="ghost"
-                    onClick={() => window.open(`https://t.me/@qlean_clone_bot?start=support_${dayjs.utc().valueOf()}`, '_blank')}>{t('create_application_support_btn')}</Button>
+                    onClick={() => window.open(`https://t.me/trueassist_bot?start=support_${dayjs.utc().valueOf()}`, '_blank')}>{t('create_application_support_btn')}</Button>
         </div>
     }
 

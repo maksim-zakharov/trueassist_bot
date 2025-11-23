@@ -15,7 +15,7 @@ export const GiftsPage = () => {
     const userInfo = useSelector(state => state.createOrder.userInfo);
     const {data: bonuses = [], isLoading, isSuccess} = useGetBonusesQuery();
 
-    const inviteLink = `https://t.me/qlean_clone_bot?startapp=ref_${userInfo.id}`;
+    const inviteLink = `https://t.me/trueassist_bot?startapp=ref_${userInfo.id}`;
 
     const handleShareButtonClick = async () => {
         const text = t('bonuses_title');

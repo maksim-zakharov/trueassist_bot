@@ -119,7 +119,7 @@ export class ServicesController implements OnModuleInit {
       newKeyPhrases.forEach((nkp) => this.keywordCache.set(nkp, service.id));
     }
 
-    let url = `https://t.me/qlean_clone_bot?startapp=service_${service.id}`;
+    let url = `https://t.me/trueassist_bot?startapp=service_${service.id}`;
     if (variant) {
       url += `_variant_${variant.id}`;
     }

@@ -5,7 +5,6 @@ import {Button} from "../../components/ui/button.tsx";
 import {useGetOrdersQuery} from "../../api/ordersApi.ts";
 import dayjs from "dayjs";
 import {ClipboardPlus, ListPlus, RotateCw} from "lucide-react";
-import {moneyFormat} from "../../lib/utils.ts";
 import {useDispatch} from "react-redux";
 import {retryOrder, selectBaseService} from "../../slices/createOrderSlice.ts";
 import {useNavigate} from "react-router-dom";
@@ -107,7 +106,9 @@ export const ClientOrdersPage = () => {
                                     variant="default" size="sm">
                                 <ListPlus className="w-5 h-5 mr-2"/> {t('client_orders_add_service_btn')}
                             </Button>
-                            <Typography.Description>{t('client_orders_support_btn')}</Typography.Description>
+                            <a href="https://t.me/trueassist_bot" target="_blank" onClick={e => e.stopPropagation()}>
+                                <Typography.Description>{t('client_orders_support_btn')}</Typography.Description>
+                            </a>
                         </div>
                     </div>
                 </Card>)}
