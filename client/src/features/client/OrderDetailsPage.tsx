@@ -5,7 +5,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import {
     useCancelAdminOrderMutation,
     useCancelOrderMutation, useCompleteOrderMutation,
-    useGetAdminOrderByIdQuery,
+    useGetAdminOrderByIdQuery, useGetOrderByIdFromExecutorQuery,
     useGetOrderByIdQuery,
     usePatchAdminOrderMutation, usePatchExecutorOrderMutation,
     usePatchOrderMutation, useProcessedOrderMutation,
@@ -46,7 +46,7 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean; isExecutor?: boolean; }> 
     const dispatch = useDispatch();
     const {data: addresses = []} = useGetAddressesQuery();
     const {id} = useParams<string>();
-    const {data: order, isLoading, isError} = (isAdmin ? useGetAdminOrderByIdQuery : useGetOrderByIdQuery)({id: id!});
+    const {data: order, isLoading, isError} = (isAdmin ? useGetAdminOrderByIdQuery : isExecutor ? useGetOrderByIdFromExecutorQuery : useGetOrderByIdQuery)({id: id!});
     const [{title, description, show}, setAlertConfig] = useState({
         title: '',
         description: '',
@@ -156,6 +156,17 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean; isExecutor?: boolean; }> 
         navigate(RoutePaths.Executor.Orders)
     }
 
+    const userName = useMemo(() => {
+        if (order?.user) {
+            let name = order?.user?.firstName;
+            if (order?.user?.lastName) {
+                name += ` ${order?.user?.lastName[0]}.`
+            }
+            return name;
+        }
+        return t('client_order_details_executor_status')
+    }, [order, t])
+
     const executorName = useMemo(() => {
         if (order?.executor) {
             let name = order?.executor?.firstName;
@@ -166,7 +177,6 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean; isExecutor?: boolean; }> 
         }
         return t('client_order_details_executor_status')
     }, [order, t])
-
 
     if (isLoading || cancelLoading || !order) {
         return <div className="p-4 mt-[56px] flex flex-col gap-4">
@@ -217,6 +227,18 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean; isExecutor?: boolean; }> 
                         </Avatar>
                     </div>
                 </div>
+                {order?.user && <div className="p-3 pl-0 flex gap-2 flex-col">
+                    <div className="flex justify-between items-center">
+                        <div className="flex flex-col">
+                            <Typography.Description>Client</Typography.Description>
+                            <Typography.Title>{userName} (<a onClick={() => window.open(`tel:+${order?.user?.phone}`)} className="text-tg-theme-link-color">+{order?.user?.phone}</a>)</Typography.Title>
+                        </div>
+                        <Avatar className="rounded-3xl bg-tg-theme-secondary-bg-color">
+                            <AvatarImage src={order?.user?.photoUrl}/>
+                            <AvatarFallback className="bg-tg-theme-secondary-bg-color"><User/></AvatarFallback>
+                        </Avatar>
+                    </div>
+                </div>}
             </Card>
             <Card className="p-0 gap-0 pl-4">
                 <div className="p-3 pl-0 separator-shadow-bottom">

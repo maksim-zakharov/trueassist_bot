@@ -13,11 +13,15 @@ import { Order, OrderStatus } from '@prisma/client';
 import { AuthGuard } from '@nestjs/passport';
 import { plainToInstance } from 'class-transformer';
 import { OrderDTO } from '../_dto/orders.dto';
+import { UserService } from '../user/user.service';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('/api/executor')
 export class ExecutorController {
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(
+    private readonly ordersService: OrdersService,
+    private readonly userService: UserService,
+  ) {}
 
   @Get('/orders')
   getOrders(@Req() req) {
@@ -32,10 +36,15 @@ export class ExecutorController {
   }
 
   @Get('/orders/:id')
-  getByIdFromExecutor(@Param('id') id: number, @Req() req) {
-    return this.ordersService
-      .getByIdFromExecutor(id, req.user.id)
-      .then((r) => plainToInstance(OrderDTO, r));
+  async getByIdFromExecutor(@Param('id') id: number, @Req() req) {
+    const order = await this.ordersService.getByIdFromExecutor(id, req.user.id);
+
+    let user;
+    if (order?.executorId === req.user.id) {
+      user = await this.userService.getById(order.userId);
+    }
+
+    return plainToInstance(OrderDTO, { ...order, user });
   }
 
   @Post('/orders/:id/complete')

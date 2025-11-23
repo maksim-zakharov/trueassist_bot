@@ -1,6 +1,7 @@
 // option._dto.ts
-import { Exclude, Type } from 'class-transformer';
+import { Exclude, Transform, Type } from 'class-transformer';
 import { OrderStatus } from '@prisma/client';
+import { UserResponseDTO } from './user-response.dto';
 
 export class OptionDTO {
   id: number;
@@ -12,6 +13,28 @@ export class OptionDTO {
   isPopular: boolean;
   @Exclude() // Исключаем это поле из ответа
   baseServiceId: number;
+}
+
+export class OrderUser {
+  @Exclude() // Исключаем это поле из ответа
+  createdAt: string;
+
+  firstName: string;
+  lastName: string;
+  // @Exclude() // Исключаем это поле из ответа
+  id: string;
+  phone: string;
+  photoUrl: string;
+  @Exclude() // Исключаем это поле из ответа
+  role: string;
+  @Exclude() // Исключаем это поле из ответа
+  username: string;
+
+  @Exclude() // Исключаем это поле из ответа
+  refId: string;
+
+  @Exclude() // Исключаем это поле из ответа
+  isAdmin?: boolean;
 }
 
 // service-variant._dto.ts
@@ -77,4 +100,7 @@ export class OrderDTO {
 
   @Type(() => ExecutorDTO)
   executor?: ExecutorDTO;
+
+  @Type(() => OrderUser)
+  user?: OrderUser;
 }
