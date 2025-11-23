@@ -17,7 +17,6 @@ import {ExecutorOrdersPage} from "./features/executor/ExecutorOrdersPage.tsx";
 import {ExecutorPaymentsPage} from "./features/executor/ExecutorPaymentsPage.tsx";
 import {ExecutorSchedulePage} from "./features/executor/ExecutorSchedulePage.tsx";
 import {ApplicationPage} from "./features/client/ApplicationPage.tsx";
-import {ExecutorOrderDetailsPage} from "./features/executor/ExecutorOrderDetailsPage.tsx";
 import './i18n';
 import {useGeoLocation} from "./hooks/useGeoLocation.tsx";
 import {AdminLayout} from "./components/layout/AdminLayout.tsx";
@@ -112,7 +111,7 @@ function App() {
                     <Route path={RoutePaths.Executor.Profile} element={<ProfilePage/>}/>
                     <Route path="*" element={<Navigate to={RoutePaths.Executor.Orders}/>}/>
                 </Route>
-                <Route path={RoutePaths.Executor.Details(':id')} element={<ExecutorOrderDetailsPage/>}/>
+                <Route path={RoutePaths.Executor.Details(':id')} element={<OrderDetailsPage isExecutor/>}/>
             </Routes>
         </div>
     }

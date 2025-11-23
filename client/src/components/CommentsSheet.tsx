@@ -6,10 +6,12 @@ import {Button} from "./ui/button.tsx";
 
 interface CommentsSheetProps {
     text?: string;
+    label: string;
     onChangeText: (text?: string) => void;
 }
 
 export function CommentsSheet({
+    label,
                                   children,
                                   text,
                                   onChangeText
@@ -51,8 +53,7 @@ export function CommentsSheet({
             </SheetTrigger>
             <SheetContent side="bottom">
                 <SheetHeader>
-                    <SheetTitle className="text-xl font-bold text-tg-theme-text-color text-left">Пожелание к
-                        заказу</SheetTitle>
+                    <SheetTitle className="text-xl font-bold text-tg-theme-text-color text-left">{label}</SheetTitle>
                 </SheetHeader>
                 <div className="flex flex-col flex-1">
                     <Textarea value={text} onChange={e => setText(e.target.value)}
@@ -70,4 +71,4 @@ export function CommentsSheet({
             </SheetContent>
         </Sheet>
     )
-} 
+}

@@ -286,6 +286,14 @@ export const ordersApi = createApi({
             }),
             providesTags: ['Order'],
         }),
+        patchExecutorOrder: builder.mutation<any, any>({
+            query: (params) => ({
+                url: `executor/orders/${params.id}`,
+                method: 'PATCH',
+                body: params,
+            }),
+            invalidatesTags: ['Order'],
+        }),
     })
 });
 
@@ -320,6 +328,7 @@ export const {
     useGetAdminOrderByIdQuery,
     useEditAdminOrderMutation,
     usePatchAdminOrderMutation,
+    usePatchExecutorOrderMutation,
     useCancelAdminOrderMutation,
     useRestoreAdminOrderMutation,
     useGetAdminChatsQuery,

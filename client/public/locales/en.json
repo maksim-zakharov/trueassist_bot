@@ -41,6 +41,7 @@
   "payments_period_week": "week",
   "payments_period_month": "month",
   "payments_comments": "Notes",
+  "payments_manager_comments": "Manager Notes",
 
   "orders_notification_complete": "Job done",
   "orders_empty_title": "No upcoming jobs",

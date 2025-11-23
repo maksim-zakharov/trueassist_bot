@@ -64,6 +64,7 @@ export class OrderDTO {
   startedAt: string;
   executorId: string | null;
   comment: string | null;
+  managerComment: string | null;
 
   @Type(() => BaseServiceDTO)
   baseService: BaseServiceDTO;

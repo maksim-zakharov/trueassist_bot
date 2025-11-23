@@ -43,6 +43,7 @@ model Order {
   executor         User?           @relation(fields: [executorId], references: [id])
   executorId       String?
   comment          String?
+  managerComment   String?
   bonus            Int?
 }
 

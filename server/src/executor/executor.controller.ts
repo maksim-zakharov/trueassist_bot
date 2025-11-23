@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Req,
   UseGuards,
@@ -60,5 +61,17 @@ export class ExecutorController {
     return this.ordersService
       .update(item)
       .then((o) => plainToInstance(OrderDTO, o));
+  }
+
+  @Patch('orders/:id')
+  async patchOrder(@Param('id') id: number, @Body() body: Order, @Req() req) {
+    const item = await this.ordersService.getByIdFromExecutor(
+      Number(id),
+      req.user.id,
+    );
+
+    Object.assign(item, body);
+
+    return this.ordersService.updateAdmin(item);
   }
 }

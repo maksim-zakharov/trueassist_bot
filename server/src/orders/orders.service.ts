@@ -292,6 +292,7 @@ export class OrdersService {
           fullAddress: data.fullAddress,
           serviceVariantId: data.serviceVariant.id,
           comment: data.comment,
+          managerComment: data.managerComment,
           options: {
             set: data.options.map(({ id }) => ({ id })),
           },

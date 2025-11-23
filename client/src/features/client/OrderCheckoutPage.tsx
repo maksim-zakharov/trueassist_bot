@@ -3,17 +3,14 @@ import {Calendar, ChevronRight, MessageSquare} from "lucide-react"
 import {useNavigate} from "react-router-dom"
 import {Checkbox} from "@/components/ui/checkbox"
 import React, {useMemo, useState} from "react";
-import EstimatedTime from "../../components/EstimatedTime.tsx";
 import {ScheduleSheet} from "../../components/ScheduleSheet.tsx";
-import {useBackButton, useTelegram} from "../../hooks/useTelegram.tsx";
-import {Accordion, AccordionContent, AccordionItem, AccordionTrigger,} from "../../components/ui/accordion.tsx"
+import {useBackButton} from "../../hooks/useTelegram.tsx";
 import {BottomActions} from "@/components/BottomActions.tsx"
 import {CommentsSheet} from "../../components/CommentsSheet.tsx";
 import dayjs from "dayjs";
 import {Typography} from "../../components/ui/Typography.tsx";
 import {useGetAddressesQuery, useGetBonusesQuery} from "../../api/api.ts";
 import {useAddOrderMutation} from "../../api/ordersApi.ts";
-import {moneyFormat} from "../../lib/utils.ts";
 import {useDispatch, useSelector} from "react-redux";
 import {AddressSheet} from "../../components/AddressSheet.tsx";
 import {selectBonus, selectDate, selectFullAddress} from "../../slices/createOrderSlice.ts";
@@ -22,8 +19,6 @@ import {AlertDialogWrapper} from "../../components/AlertDialogWrapper.tsx";
 import {RoutePaths} from "../../routes.ts";
 import {ListButton, ListButtonGroup} from "../../components/ListButton/ListButton.tsx";
 import {useTranslation} from "react-i18next";
-import {Slider} from "../../components/ui/slider.tsx";
-import {Card} from "../../components/ui/card.tsx";
 
 
 export const OrderCheckoutPage = () => {
@@ -42,6 +37,8 @@ export const OrderCheckoutPage = () => {
     const orderId = useSelector(state => state.createOrder.id)
     const dispatch = useDispatch();
 
+    const [isAssepted, setAssepted] = useState(false)
+
     const [error, setError] = useState<string | undefined>();
 
     const navigate = useNavigate()
@@ -56,13 +53,8 @@ export const OrderCheckoutPage = () => {
     });
 
     const [comment, setComment] = useState<string | undefined>();
-    const {vibro} = useTelegram();
     const {data: addresses = []} = useGetAddressesQuery();
     const totalPrice = useMemo(() => options.reduce((sum, option) => sum + option.price, serviceVariant?.basePrice || 0), [serviceVariant, options]);
-    const totalWithBonus = useMemo(() => totalPrice - bonus, [totalPrice, bonus]);
-
-    // Считаем общее время
-    const totalDuration = useMemo(() => options.reduce((sum, option) => sum + (option?.duration || 0), serviceVariant?.duration || 0), [serviceVariant, options]);
 
     const dateTitle = useMemo(() => {
         if (!selectedTimestamp) {
@@ -212,7 +204,7 @@ export const OrderCheckoutPage = () => {
 
                 {/* Terms Checkbox */}
                 <div className="flex items-center gap-2">
-                    <Checkbox id="terms"/>
+                    <Checkbox id="terms" checked={isAssepted} onCheckedChange={e => setAssepted(Boolean(e))}/>
                     <label htmlFor="terms" className="text-sm text-tg-theme-text-color">
                         {t('client_accept_1')} <span className="text-tg-theme-link-color">{t('client_accept_2')}</span>
                     </label>
@@ -226,6 +218,7 @@ export const OrderCheckoutPage = () => {
                     wide
                     loading={isLoading}
                     onClick={handleOnSubmit}
+                    disabled={!isAssepted}
                 >
                     {t('client_checkout_submit_btn')}
                 </Button>

@@ -4,20 +4,18 @@ import React, {FC, useMemo, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {
     useCancelAdminOrderMutation,
-    useCancelOrderMutation,
+    useCancelOrderMutation, useCompleteOrderMutation,
     useGetAdminOrderByIdQuery,
     useGetOrderByIdQuery,
-    usePatchAdminOrderMutation,
-    usePatchOrderMutation,
+    usePatchAdminOrderMutation, usePatchExecutorOrderMutation,
+    usePatchOrderMutation, useProcessedOrderMutation,
     useRestoreAdminOrderMutation
 } from "../../api/ordersApi.ts";
 import {useGetAddressesQuery} from "../../api/api.ts";
-import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "../../components/ui/accordion.tsx";
-import {moneyFormat} from "../../lib/utils.ts";
 import dayjs from "dayjs";
 import {Button} from "../../components/ui/button.tsx";
 import {Card} from "../../components/ui/card.tsx";
-import {User} from "lucide-react";
+import {CalendarCheck, User} from "lucide-react";
 import {Avatar, AvatarFallback, AvatarImage} from "../../components/ui/avatar.tsx";
 import {BottomActions} from "../../components/BottomActions.tsx";
 import {Skeleton} from "../../components/ui/skeleton.tsx";
@@ -33,11 +31,15 @@ import {useTranslation} from "react-i18next";
 import {ErrorState} from "../../components/ErrorState.tsx";
 import {OrderStatusText} from "../../components/OrderStatusText.tsx";
 import {useBackButton} from "../../hooks/useTelegram.tsx";
+import {toast} from "sonner";
 
-export const OrderDetailsPage: FC<{ isAdmin?: boolean }> = ({isAdmin}) => {
+export const OrderDetailsPage: FC<{ isAdmin?: boolean; isExecutor?: boolean; }> = ({isAdmin, isExecutor}) => {
     const {t} = useTranslation();
+    const [completeOrder, {isLoading: completeOrderLoading}] = useCompleteOrderMutation();
+    const [processedOrder, {isLoading: processedOrderLoading}] = useProcessedOrderMutation();
+    const [orderToDelete, setOrderToDelete] = useState<any | null>(null);
     const [restore, {isLoading: restoreLoading}] = useRestoreAdminOrderMutation();
-    const [patchOrder] = (isAdmin ? usePatchAdminOrderMutation : usePatchOrderMutation)();
+    const [patchOrder] = (isAdmin ? usePatchAdminOrderMutation : isExecutor ? usePatchExecutorOrderMutation : usePatchOrderMutation)();
     const [cancelOrder, {isLoading: cancelLoading}] = (isAdmin ? useCancelAdminOrderMutation : useCancelOrderMutation)();
     const navigate = useNavigate()
     useBackButton(() => navigate(RoutePaths.Order.List));
@@ -68,7 +70,8 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean }> = ({isAdmin}) => {
         }, id => id === 'ok' && restore({id: order?.id}).unwrap())
     }
 
-    const canEdit = isAdmin || Boolean(order?.status) && ['todo'].includes(order?.status);
+    const canEditByExecutor = isExecutor && Boolean(order?.status) && !['completed', 'canceled', 'todo'].includes(order?.status);
+    const canEdit = isAdmin || !isExecutor && Boolean(order?.status) && ['todo'].includes(order?.status);
 
     const totalPrice = useMemo(() => order?.options.reduce((sum, option) => sum + option.price, order?.serviceVariant?.basePrice || 0) || 0, [order]);
     const totalWithBonus = useMemo(() => totalPrice - (order?.bonus || 0), [totalPrice, order?.bonus]);
@@ -86,6 +89,11 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean }> = ({isAdmin}) => {
     const handleChangeComment = async (comment?: string) => {
         if (comment && comment !== order.comment)
             await patchOrder({id: order.id, comment}).unwrap();
+    }
+
+    const handleChangeManagerComment = async (managerComment?: string) => {
+        if (managerComment && managerComment !== order.managerComment)
+            await patchOrder({id: order.id, managerComment}).unwrap();
     }
 
     const handleAddOptionClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -119,6 +127,33 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean }> = ({isAdmin}) => {
                 type: 'destructive'
             }]
         }, id => id === 'cancel' && handleCancelClick())
+    }
+
+    const handleApplyJob = async (order) => {
+        try {
+            await processedOrder(order).unwrap()
+        } catch (e: any) {
+            if (e.data.message) {
+                toast(e.data.message, {
+                    // classNames: {
+                    //     icon: 'mr-2 h-5 w-5 text-[var(--chart-2)]'
+                    // },
+                    // icon: <CalendarCheck className="h-5 w-5 text-[var(--chart-2)]"/>
+                })
+            }
+        }
+    }
+
+    const handleFinishOrder = async (order) => {
+        await completeOrder(order).unwrap();
+        setOrderToDelete(undefined);
+        toast(t('orders_notification_complete'), {
+            classNames: {
+                icon: 'mr-2 h-5 w-5 text-[var(--chart-2)]'
+            },
+            icon: <CalendarCheck className="h-5 w-5 text-[var(--chart-2)]"/>
+        })
+        navigate(RoutePaths.Executor.Orders)
     }
 
     const executorName = useMemo(() => {
@@ -190,10 +225,10 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean }> = ({isAdmin}) => {
                             <Typography.Description>{dayjs.utc(order.date).local().format('D MMMM')}</Typography.Description>
                             <Typography.Title>{dayjs.utc(order.date).local().format('HH:mm')}</Typography.Title>
                         </div>
-                        {canEdit && <ScheduleSheet serviceVariantId={order?.serviceVariant?.id}
-                                                   optionIds={order?.options.map(o => o.id)}
-                                                   selectedTimestamp={dayjs.utc(order.date).valueOf()}
-                                                   onSelectDate={handleSelectDate}>
+                        {canEdit || canEditByExecutor && <ScheduleSheet serviceVariantId={order?.serviceVariant?.id}
+                                                                        optionIds={order?.options.map(o => o.id)}
+                                                                        selectedTimestamp={dayjs.utc(order.date).valueOf()}
+                                                                        onSelectDate={handleSelectDate}>
                             <EditButton/>
                         </ScheduleSheet>}
                     </div>
@@ -204,7 +239,7 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean }> = ({isAdmin}) => {
                             <Typography.Description>{t('address')}</Typography.Description>
                             <Typography.Title>{order.fullAddress}</Typography.Title>
                         </div>
-                        {canEdit && <AddressSheet
+                        {canEdit || canEditByExecutor && <AddressSheet
                             addresses={addresses}
                             onAddressSelect={handleSelectAddress}
                         >
@@ -219,7 +254,19 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean }> = ({isAdmin}) => {
                             <Typography.Title
                                 className="[overflow-wrap:anywhere]">{order.comment || t('client_order_details_comments_empty')}</Typography.Title>
                         </div>
-                        {canEdit && <CommentsSheet onChangeText={handleChangeComment} text={order.commet}>
+                        {canEdit && <CommentsSheet label={t('payments_comments')} onChangeText={handleChangeComment} text={order.comment}>
+                            <EditButton/>
+                        </CommentsSheet>}
+                    </div>
+                </div>
+                <div className="p-3 pl-0 flex gap-2 flex-col">
+                    <div className="flex justify-between items-center">
+                        <div className="flex flex-col">
+                            <Typography.Description>{t('payments_manager_comments')}</Typography.Description>
+                            <Typography.Title
+                                className="[overflow-wrap:anywhere]">{order.managerComment || t('client_order_details_comments_empty')}</Typography.Title>
+                        </div>
+                        {canEditByExecutor && <CommentsSheet label={t('payments_manager_comments')} onChangeText={handleChangeManagerComment} text={order.managerComment}>
                             <EditButton/>
                         </CommentsSheet>}
                     </div>
@@ -275,7 +322,7 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean }> = ({isAdmin}) => {
             {/*    </AccordionItem>*/}
             {/*</Accordion>*/}
         </div>
-        {canEdit && <>
+        {canEdit &&
             <BottomActions
                 className="flex flex-col gap-2 [min-height:calc(58px+var(--tg-safe-area-inset-bottom))] [padding-bottom:var(--tg-safe-area-inset-bottom)]">
                 {order.status !== 'canceled' && <>
@@ -305,7 +352,28 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean }> = ({isAdmin}) => {
                     Restore
                 </Button>}
             </BottomActions>
-        </>
         }
+        {order?.status === 'todo' && isExecutor &&
+            <BottomActions
+                className="flex flex-col gap-2 [min-height:calc(58px+var(--tg-safe-area-inset-bottom))] [padding-bottom:var(--tg-safe-area-inset-bottom)]">
+                <Button wide loading={processedOrderLoading}
+                                                                   onClick={() => handleApplyJob(order)}>{t('executor_order_apply_btn')}</Button>
+            </BottomActions>
+        }
+        {order?.status === 'processed' && isExecutor &&
+            <BottomActions
+                className="flex flex-col gap-2 [min-height:calc(58px+var(--tg-safe-area-inset-bottom))] [padding-bottom:var(--tg-safe-area-inset-bottom)]">
+                {order?.status === 'processed' &&
+                    <Button onClick={() => setOrderToDelete(order)}
+                            wide>{t('executor_order_complete_btn')}</Button>}
+            </BottomActions>
+        }
+        <AlertDialogWrapper open={Boolean(orderToDelete)} title={t('finalize_order_modal_title')}
+                            description={t('finalize_order_modal_description')}
+                            onOkText={t('finalize_order_modal_ok_btn')}
+                            onCancelText={t('finalize_order_modal_cancel_btn')}
+                            okLoading={completeOrderLoading}
+                            onCancelClick={() => setOrderToDelete(undefined)}
+                            onOkClick={() => handleFinishOrder(orderToDelete)}></AlertDialogWrapper>
     </div>
 }
