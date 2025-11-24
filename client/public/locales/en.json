@@ -94,6 +94,7 @@
   "client_order_details_cancel_btn": "Cancel",
   "client_checkout_date_placeholder": "Select date and time",
   "client_checkout_date_error": "Please select date and time",
+  "client_checkout_address_placeholder": "Select address",
   "client_checkout_address_error": "Please select address",
   "client_checkout_dialog_error_title": "Order not be ordered",
   "client_checkout_title": "Checkout",

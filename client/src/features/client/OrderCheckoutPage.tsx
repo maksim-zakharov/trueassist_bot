@@ -1,5 +1,5 @@
 import {Button} from "@/components/ui/button"
-import {Calendar, ChevronRight, MessageSquare} from "lucide-react"
+import {Calendar, ChevronRight, MessageSquare, Phone} from "lucide-react"
 import {useNavigate} from "react-router-dom"
 import {Checkbox} from "@/components/ui/checkbox"
 import React, {useMemo, useState} from "react";
@@ -13,7 +13,7 @@ import {useGetAddressesQuery, useGetBonusesQuery} from "../../api/api.ts";
 import {useAddOrderMutation} from "../../api/ordersApi.ts";
 import {useDispatch, useSelector} from "react-redux";
 import {AddressSheet} from "../../components/AddressSheet.tsx";
-import {selectBonus, selectDate, selectFullAddress} from "../../slices/createOrderSlice.ts";
+import {logout, selectBonus, selectDate, selectFullAddress} from "../../slices/createOrderSlice.ts";
 import {Header} from "../../components/ui/Header.tsx";
 import {AlertDialogWrapper} from "../../components/AlertDialogWrapper.tsx";
 import {RoutePaths} from "../../routes.ts";
@@ -35,6 +35,7 @@ export const OrderCheckoutPage = () => {
     const serviceVariant = useSelector(state => state.createOrder.serviceVariant)
     const fullAddress = useSelector(state => state.createOrder.fullAddress?.fullAddress)
     const orderId = useSelector(state => state.createOrder.id)
+    const userInfo = useSelector(state => state.createOrder.userInfo)
     const dispatch = useDispatch();
 
     const [isAssepted, setAssepted] = useState(false)
@@ -69,6 +70,14 @@ export const OrderCheckoutPage = () => {
     }
 
     const handleSelectDate = (date) => dispatch(selectDate({date}));
+
+    const handleRequestContact = () => Telegram.WebApp?.requestContact(async (isRequested) => {
+        if (!isRequested) {
+            return;
+        }
+        dispatch(logout())
+        window.location.reload();
+    })
 
     const handleOnSubmit = async () => {
         try {
@@ -112,13 +121,14 @@ export const OrderCheckoutPage = () => {
                     <Button variant="ghost"
                             className="flex flex-col items-center h-auto text-tg-theme-text-color text-base font-medium">
                         <Typography.Title>{t('client_checkout_title')}</Typography.Title>
-                        <Typography.Description>{fullAddress}</Typography.Description>
+                        <Typography.Description>{fullAddress || t('client_checkout_address_placeholder')}</Typography.Description>
                     </Button>
                 </AddressSheet>
             </Header>
 
             <div className="content flex flex-col gap-6 p-4">
-                <ListButtonGroup>
+                
+            <ListButtonGroup>
                     <ScheduleSheet serviceVariantId={serviceVariant?.id} optionIds={options.map(o => o.id)} selectedTimestamp={selectedTimestamp} onSelectDate={handleSelectDate}
                     >
                         <ListButton icon={<Calendar
@@ -134,6 +144,27 @@ export const OrderCheckoutPage = () => {
                                         className="w-5 h-5 text-tg-theme-hint-color mr-[-8px] opacity-50"/>}/>
                     </CommentsSheet>
                 </ListButtonGroup>
+                {!userInfo?.phone && (
+                    <ListButtonGroup>
+                        <ListButton 
+                            icon={<Phone className="p-1 w-7 h-7 bg-[var(--tg-accent-green)] rounded-md"/>}
+                            text={<div className="flex flex-col text-left">
+                                <Typography.Description>{t('phone')}</Typography.Description>
+                                {t('profile_phone_notavailable')}
+                            </div>}
+                            extra={
+                                <Button 
+                                    className="p-0 border-none h-6 whitespace-nowrap" 
+                                    size="sm" 
+                                    variant="default"
+                                    onClick={handleRequestContact}
+                                >
+                                    {t('error_refresh_btn')}
+                                </Button>
+                            }
+                        />
+                    </ListButtonGroup>
+                )}
 
                 {/* убрать отображение цен */}
                 {/*<div>*/}
@@ -218,7 +249,7 @@ export const OrderCheckoutPage = () => {
                     wide
                     loading={isLoading}
                     onClick={handleOnSubmit}
-                    disabled={!isAssepted}
+                    disabled={!isAssepted || !userInfo?.phone}
                 >
                     {t('client_checkout_submit_btn')}
                 </Button>
