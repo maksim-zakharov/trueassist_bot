@@ -20,9 +20,11 @@ import {useTranslation} from "react-i18next";
 import {ErrorState} from "../../components/ErrorState.tsx";
 import {ListButton} from "../../components/ListButton/ListButton.tsx";
 import {CalendarSheet} from "../../components/CalendarSheet.tsx";
+import {FilterChips, FilterChipOption} from "../../components/ui/filter-chips.tsx";
 
 export const ExecutorOrdersPage = () => {
     const [selectedTimestamp, handleSelectDate] = useState<Date | undefined>();
+    const [statusFilter, setStatusFilter] = useState<'all' | 'completed' | 'canceled'>('all');
     const {t} = useTranslation();
     const [completeOrder, {isLoading: completeOrderLoading}] = useCompleteOrderMutation();
     const navigate = useNavigate()
@@ -58,10 +60,37 @@ export const ExecutorOrdersPage = () => {
 
     const [searchParams, setSearchParams] = useSearchParams();
     const tab = searchParams.get('tab') || 'active'; // result[0]?.timestamp.toString();
-    const filteredOrders = useMemo(() => orders
-            .filter(o => (tab === 'active' ? !['completed', 'canceled'].includes(o.status) : ['completed', 'canceled'].includes(o.status) && (!selectedTimestamp || dayjs(o.date).startOf('day').isSame(dayjs(selectedTimestamp).startOf('day')))))
-            .sort((a, b) => b.date.localeCompare(a.date))
-        , [orders, tab, selectedTimestamp]);
+    
+    const statusFilterOptions: FilterChipOption[] = useMemo(() => [
+        { value: 'all', label: t('orders_filter_all') || 'All' },
+        { value: 'completed', label: t('client_orders_completed_status') },
+        { value: 'canceled', label: t('client_orders_canceled_status') },
+    ], [t]);
+    
+    const filteredOrders = useMemo(() => {
+        if (tab === 'active') {
+            return orders
+                .filter(o => !['completed', 'canceled'].includes(o.status))
+                .sort((a, b) => b.date.localeCompare(a.date));
+        }
+        
+        // Archive tab filtering
+        let archiveOrders = orders.filter(o => ['completed', 'canceled'].includes(o.status));
+        
+        // Apply status filter
+        if (statusFilter !== 'all') {
+            archiveOrders = archiveOrders.filter(o => o.status === statusFilter);
+        }
+        
+        // Apply date filter
+        if (selectedTimestamp) {
+            archiveOrders = archiveOrders.filter(o => 
+                dayjs(o.date).startOf('day').isSame(dayjs(selectedTimestamp).startOf('day'))
+            );
+        }
+        
+        return archiveOrders.sort((a, b) => b.date.localeCompare(a.date));
+    }, [orders, tab, selectedTimestamp, statusFilter]);
     const activeOrders = useMemo(() => filteredOrders.filter(o => o.status === 'processed').sort((a, b) => b.id - a.id), [filteredOrders]);
 
     const handleFinishOrder = async (order) => {
@@ -127,7 +156,7 @@ export const ExecutorOrdersPage = () => {
                 </TabsList>
             </Tabs>
         </Header>
-        {tab === 'archive' && <div className="ml-3 mr-3 mt-2">
+        {tab === 'archive' && <div className="ml-3 mr-3 mt-2 flex flex-col gap-2">
             <CalendarSheet disabled={isPastDate} selectedTimestamp={selectedTimestamp} onSelectDate={handleSelectDate}
             >
                 <ListButton icon={<Calendar
@@ -138,6 +167,11 @@ export const ExecutorOrdersPage = () => {
                             }}
                                                            className="w-5 h-5 text-tg-theme-hint-color mr-[-8px] opacity-50"/>}/>
             </CalendarSheet>
+            <FilterChips
+                options={statusFilterOptions}
+                value={statusFilter}
+                onChange={(value) => setStatusFilter(value as 'all' | 'completed' | 'canceled')}
+            />
         </div>}
         <div className="flex flex-col gap-4 py-4">
             {filteredOrders.length === 0 && <EmptyState className="flex justify-center h-screen items-center m-auto"

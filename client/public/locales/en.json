@@ -48,6 +48,7 @@
   "orders_empty_description": "Accepted jobs will show up here.",
   "orders_in_progress_title": "In progress",
   "orders_complete_btn": "Mark Done",
+  "orders_filter_all": "All",
   "finalize_order_modal_title": "Complete order",
   "finalize_order_modal_description": "Ready to wrap up this job?",
   "finalize_order_modal_ok_btn": "Yes",
