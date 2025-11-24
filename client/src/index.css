@@ -396,6 +396,10 @@ html {
         background-color: rgb(from var(--tg-theme-section-bg-color) r g b / 90%);
     }
 
+    .button-groups-bg-color-transparency {
+        background-color: rgb(from var(--tg-theme-section-bg-color) r g b / 90%);
+    }
+
     .dark {
         .root-bg-color {
             background-color: var(--tg-theme-bg-color);
@@ -414,6 +418,10 @@ html {
         }
 
         .card-bg-color-transparency {
+            background-color: rgb(from var(--tg-theme-secondary-bg-color) r g b / 90%);
+        }
+
+        .button-groups-bg-color-transparency {
             background-color: rgb(from var(--tg-theme-bottom_bar_bg_color) r g b / 90%);
         }
     }

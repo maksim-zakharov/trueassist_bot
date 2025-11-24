@@ -33,7 +33,7 @@ export const FilterChips: React.FC<FilterChipsProps> = ({
                   ? 'var(--tg-theme-text-color, #000000)' 
                   : 'var(--tg-theme-hint-color)'
               }}
-              className={cn("rounded-full px-4 py-1.5 whitespace-nowrap text-sm font-medium transition-colors", isSelected ? 'card-bg-color-transparency' : 'transparent')}
+              className={cn("rounded-full px-4 py-1.5 whitespace-nowrap text-sm font-medium transition-colors", isSelected ? 'card-bg-color' : 'transparent')}
             >
               {option.label}
             </button>
