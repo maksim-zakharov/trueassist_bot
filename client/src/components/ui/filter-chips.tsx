@@ -1,3 +1,4 @@
+import { cn } from '@/lib/utils';
 import React from 'react';
 
 export interface FilterChipOption {
@@ -28,14 +29,11 @@ export const FilterChips: React.FC<FilterChipsProps> = ({
               key={option.value}
               onClick={() => onChange(option.value)}
               style={{
-                backgroundColor: isSelected 
-                  ? 'rgba(128, 128, 128, 0.2)' 
-                  : 'transparent',
                 color: isSelected 
                   ? 'var(--tg-theme-text-color, #000000)' 
                   : 'var(--tg-theme-hint-color)'
               }}
-              className="rounded-full px-4 py-1.5 whitespace-nowrap text-sm font-medium transition-colors"
+              className={cn("rounded-full px-4 py-1.5 whitespace-nowrap text-sm font-medium transition-colors", isSelected ? 'card-bg-color-transparency' : 'transparent')}
             >
               {option.label}
             </button>

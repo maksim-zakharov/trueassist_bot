@@ -393,7 +393,7 @@ html {
     }
 
     .card-bg-color-transparency {
-        background-color: rgb(from var(--tg-theme-bottom_bar_bg_color) r g b / 90%);
+        background-color: rgb(from var(--tg-theme-section-bg-color) r g b / 90%);
     }
 
     .dark {
