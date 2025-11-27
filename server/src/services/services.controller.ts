@@ -170,6 +170,11 @@ export class ServicesController implements OnModuleInit {
     const text = (ctx.message as any)?.text;
     if (!text) return;
 
+    // Игнорируем Telegram-команды (например, /start), чтобы они не улетали в админский чат
+    if (text.startsWith('/')) {
+      return;
+    }
+
     await this.chatService.messageFromTGToAdmin(ctx);
   }
 
