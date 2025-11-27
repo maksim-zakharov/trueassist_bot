@@ -4,11 +4,16 @@ import React, {FC, useMemo, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {
     useCancelAdminOrderMutation,
-    useCancelOrderMutation, useCompleteOrderMutation,
-    useGetAdminOrderByIdQuery, useGetOrderByIdFromExecutorQuery,
+    useCancelOrderMutation,
+    useCompleteOrderMutation,
+    useGetAdminOrderByIdQuery,
+    useGetOrderByIdFromExecutorQuery,
     useGetOrderByIdQuery,
-    usePatchAdminOrderMutation, usePatchExecutorOrderMutation,
-    usePatchOrderMutation, useProcessedOrderMutation,
+    usePatchAdminOrderMutation,
+    usePatchExecutorOrderMutation,
+    usePatchOrderMutation,
+    useProcessedOrderMutation,
+    useRejectExecutorOrderMutation,
     useRestoreAdminOrderMutation
 } from "../../api/ordersApi.ts";
 import {useGetAddressesQuery} from "../../api/api.ts";
@@ -37,7 +42,9 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean; isExecutor?: boolean; }> 
     const {t} = useTranslation();
     const [completeOrder, {isLoading: completeOrderLoading}] = useCompleteOrderMutation();
     const [processedOrder, {isLoading: processedOrderLoading}] = useProcessedOrderMutation();
+    const [rejectExecutorOrder, {isLoading: rejectOrderLoading}] = useRejectExecutorOrderMutation();
     const [orderToDelete, setOrderToDelete] = useState<any | null>(null);
+    const [orderToReject, setOrderToReject] = useState<any | null>(null);
     const [restore, {isLoading: restoreLoading}] = useRestoreAdminOrderMutation();
     const [patchOrder] = (isAdmin ? usePatchAdminOrderMutation : isExecutor ? usePatchExecutorOrderMutation : usePatchOrderMutation)();
     const [cancelOrder, {isLoading: cancelLoading}] = (isAdmin ? useCancelAdminOrderMutation : useCancelOrderMutation)();
@@ -154,6 +161,18 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean; isExecutor?: boolean; }> 
             icon: <CalendarCheck className="h-5 w-5 text-[var(--chart-2)]"/>
         })
         navigate(RoutePaths.Executor.Orders)
+    }
+
+    const handleRejectOrder = async (order) => {
+        try {
+            await rejectExecutorOrder(order).unwrap();
+            toast(t('executor_order_reject_success'));
+            navigate(RoutePaths.Executor.Orders);
+        } catch (e: any) {
+            if (e.data?.message) {
+                toast(e.data.message);
+            }
+        }
     }
 
     const userName = useMemo(() => {
@@ -385,9 +404,25 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean; isExecutor?: boolean; }> 
         {order?.status === 'processed' && isExecutor &&
             <BottomActions
                 className="flex flex-col gap-2 [min-height:calc(58px+var(--tg-safe-area-inset-bottom))] [padding-bottom:var(--tg-safe-area-inset-bottom)]">
-                {order?.status === 'processed' &&
-                    <Button onClick={() => setOrderToDelete(order)}
-                            wide>{t('executor_order_complete_btn')}</Button>}
+                {order?.status === 'processed' && (
+                    <>
+                        <Button
+                            wide
+                            disabled={!order || completeOrderLoading}
+                            onClick={() => setOrderToDelete(order)}
+                        >
+                            {t('executor_order_complete_btn')}
+                        </Button>
+                        <Button
+                            wide
+                            variant="outline"
+                            disabled={rejectOrderLoading}
+                            onClick={() => setOrderToReject(order)}
+                        >
+                            {t('executor_order_reject_btn')}
+                        </Button>
+                    </>
+                )}
             </BottomActions>
         }
         <AlertDialogWrapper open={Boolean(orderToDelete)} title={t('finalize_order_modal_title')}
@@ -397,5 +432,17 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean; isExecutor?: boolean; }> 
                             okLoading={completeOrderLoading}
                             onCancelClick={() => setOrderToDelete(undefined)}
                             onOkClick={() => handleFinishOrder(orderToDelete)}></AlertDialogWrapper>
+        <AlertDialogWrapper open={Boolean(orderToReject)} title={t('executor_order_reject_modal_title')}
+                            description={t('executor_order_reject_modal_description')}
+                            onOkText={t('executor_order_reject_modal_ok_btn')}
+                            onCancelText={t('executor_order_reject_modal_cancel_btn')}
+                            okLoading={rejectOrderLoading}
+                            onCancelClick={() => setOrderToReject(undefined)}
+                            onOkClick={() => {
+                                if (orderToReject) {
+                                    handleRejectOrder(orderToReject);
+                                    setOrderToReject(undefined);
+                                }
+                            }}></AlertDialogWrapper>
     </div>
 }
