@@ -404,9 +404,7 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean; isExecutor?: boolean; }> 
         {order?.status === 'processed' && isExecutor &&
             <BottomActions
                 className="flex flex-col gap-2 [min-height:calc(58px+var(--tg-safe-area-inset-bottom))] [padding-bottom:var(--tg-safe-area-inset-bottom)]">
-                {order?.status === 'processed' && (
-                    <>
-                        <Button
+                <Button
                             wide
                             size="lg"
                             disabled={!order || completeOrderLoading}
@@ -424,8 +422,6 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean; isExecutor?: boolean; }> 
                         >
                             {t('executor_order_reject_btn')}
                         </Button>
-                    </>
-                )}
             </BottomActions>
         }
         <AlertDialogWrapper open={Boolean(orderToDelete)} title={t('finalize_order_modal_title')}
