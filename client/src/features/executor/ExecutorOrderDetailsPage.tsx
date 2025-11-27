@@ -2,7 +2,8 @@ import {useNavigate, useParams} from "react-router-dom";
 import {
     useCompleteOrderMutation,
     useGetOrderByIdFromExecutorQuery,
-    useProcessedOrderMutation
+    useProcessedOrderMutation,
+    useRejectExecutorOrderMutation
 } from "../../api/ordersApi.ts";
 import React, {useMemo, useState} from "react";
 import {Button} from "../../components/ui/button.tsx";
@@ -35,7 +36,9 @@ export const ExecutorOrderDetailsPage = () => {
 
     const [completeOrder, {isLoading: completeOrderLoading}] = useCompleteOrderMutation();
     const [processedOrder, {isLoading: processedOrderLoading}] = useProcessedOrderMutation();
+    const [rejectExecutorOrder, {isLoading: rejectOrderLoading}] = useRejectExecutorOrderMutation();
     const [orderToDelete, setOrderToDelete] = useState<any | null>(null);
+    const [orderToReject, setOrderToReject] = useState<any | null>(null);
     const {id} = useParams<string>();
     const {vibro} = useTelegram();
     const {data: order, isLoading, isError} = useGetOrderByIdFromExecutorQuery({id: id!});
@@ -52,6 +55,18 @@ export const ExecutorOrderDetailsPage = () => {
             icon: <CalendarCheck className="h-5 w-5 text-[var(--chart-2)]"/>
         })
         navigate(RoutePaths.Executor.Orders)
+    }
+
+    const handleRejectOrder = async (order) => {
+        try {
+            await rejectExecutorOrder(order).unwrap();
+            toast(t('executor_order_reject_success'));
+            navigate(RoutePaths.Executor.Orders);
+        } catch (e: any) {
+            if (e.data?.message) {
+                toast(e.data.message);
+            }
+        }
     }
 
     const handleApplyJob = async (order) => {
@@ -132,8 +147,14 @@ export const ExecutorOrderDetailsPage = () => {
                     {canStart && <Button wide loading={processedOrderLoading}
                                          onClick={() => handleApplyJob(order)}>{t('executor_order_apply_btn')}</Button>}
                     {order?.status === 'processed' &&
-                        <Button disabled={!canFinalized} onClick={() => setOrderToDelete(order)}
-                                wide>{t('executor_order_complete_btn')}</Button>}
+                        <>
+                            <Button disabled={!canFinalized || completeOrderLoading}
+                                    onClick={() => setOrderToDelete(order)}
+                                    wide>{t('executor_order_complete_btn')}</Button>
+                            <Button variant="outline" disabled={rejectOrderLoading}
+                                    onClick={() => setOrderToReject(order)}
+                                    wide>{t('executor_order_reject_btn')}</Button>
+                        </>}
                 </BottomActions>}
         </div>
         <AlertDialogWrapper open={Boolean(orderToDelete)} title={t('finalize_order_modal_title')}
@@ -143,5 +164,17 @@ export const ExecutorOrderDetailsPage = () => {
                             okLoading={completeOrderLoading}
                             onCancelClick={() => setOrderToDelete(undefined)}
                             onOkClick={() => handleFinishOrder(orderToDelete)}></AlertDialogWrapper>
+        <AlertDialogWrapper open={Boolean(orderToReject)} title={t('executor_order_reject_modal_title')}
+                            description={t('executor_order_reject_modal_description')}
+                            onOkText={t('executor_order_reject_modal_ok_btn')}
+                            onCancelText={t('executor_order_reject_modal_cancel_btn')}
+                            okLoading={rejectOrderLoading}
+                            onCancelClick={() => setOrderToReject(undefined)}
+                            onOkClick={() => {
+                                if (orderToReject) {
+                                    handleRejectOrder(orderToReject);
+                                    setOrderToReject(undefined);
+                                }
+                            }}></AlertDialogWrapper>
     </>
 }

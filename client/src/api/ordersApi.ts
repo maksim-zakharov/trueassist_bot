@@ -232,6 +232,14 @@ export const ordersApi = createApi({
             }),
             invalidatesTags: ['Order'],
         }),
+        rejectExecutorOrder: builder.mutation<any, any>({
+            query: (params) => ({
+                url: `/executor/orders/${params.id}/reject`,
+                method: 'POST',
+                body: params,
+            }),
+            invalidatesTags: ['Order'],
+        }),
         approveApplication: builder.mutation<any, any>({
             query: (params) => ({
                 url: `/admin/applications/${params.id}/approve`,
@@ -315,6 +323,7 @@ export const {
     useGetExecutorOrdersQuery,
     useCompleteOrderMutation,
     useProcessedOrderMutation,
+    useRejectExecutorOrderMutation,
     useGetAdminOrdersByUserIdQuery,
     useGetAdminOrdersQuery,
     useApproveApplicationMutation,

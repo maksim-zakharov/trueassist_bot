@@ -7,6 +7,7 @@ import {
   Post,
   Req,
   UseGuards,
+  BadRequestException,
 } from '@nestjs/common';
 import { OrdersService } from '../orders/orders.service';
 import { Order, OrderStatus } from '@prisma/client';
@@ -70,6 +71,22 @@ export class ExecutorController {
     return this.ordersService
       .update(item)
       .then((o) => plainToInstance(OrderDTO, o));
+  }
+
+  @Post('/orders/:id/reject')
+  async rejectOrder(@Param('id') id: number, @Req() req) {
+    const item = await this.ordersService.getByIdFromExecutor(id, req.user.id);
+
+    // Только если заказ уже принят текущим исполнителем
+    if (item.executorId !== req.user.id || item.status !== OrderStatus.processed) {
+      throw new BadRequestException({
+        message: 'Order cannot be rejected in current status',
+      });
+    }
+
+    const updated = await this.ordersService.cancelByExecutor(req.user.id, String(id));
+
+    return plainToInstance(OrderDTO, updated);
   }
 
   @Patch('orders/:id')

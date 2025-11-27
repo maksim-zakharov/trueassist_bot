@@ -275,6 +275,40 @@ export class OrdersService {
     });
   }
 
+  async cancelByExecutor(executorId: Order['executorId'], id: string) {
+    return this.prisma.$transaction(async (tx) => {
+      const order = await tx.order.findUnique({
+        where: {
+          id: Number(id),
+          executorId,
+        },
+      });
+
+      if (!order) throw new NotFoundException('Order not found');
+
+      // Исполнитель может отказаться только от текущего назначенного заказа
+      if (order.status !== OrderStatus.processed) {
+        throw new BadRequestException({
+          message: 'Order cannot be rejected in current status',
+        });
+      }
+
+      order.status = OrderStatus.todo;
+      order.executorId = null;
+      order.startedAt = null;
+
+      const updated = await tx.order.update({
+        where: { id: Number(id) },
+        data: order,
+        include: {
+          options: true,
+        },
+      });
+
+      return updated;
+    });
+  }
+
   async updateAdmin(data: any): Promise<Order> {
     // Проверка что дата заказа позже текущего времени
     // this.validateOrderDate(data.date);
