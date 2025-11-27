@@ -111,7 +111,7 @@
   "executor_order_details_title": "What you have to do:",
   "executor_order_apply_btn": "Apply",
   "executor_order_complete_btn": "Complete",
-  "executor_order_reject_btn": "Reject order",
+  "executor_order_reject_btn": "Reject",
   "executor_order_reject_success": "Order returned to queue",
   "executor_order_reject_modal_title": "Reject order",
   "executor_order_reject_modal_description": "Are you sure you want to reject this order?",

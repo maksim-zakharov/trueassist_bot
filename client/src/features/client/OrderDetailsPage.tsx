@@ -408,6 +408,7 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean; isExecutor?: boolean; }> 
                     <>
                         <Button
                             wide
+                            size="lg"
                             disabled={!order || completeOrderLoading}
                             onClick={() => setOrderToDelete(order)}
                         >
@@ -415,7 +416,9 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean; isExecutor?: boolean; }> 
                         </Button>
                         <Button
                             wide
-                            variant="outline"
+                            size="lg"
+                            className="border-none"
+                            variant="default"
                             disabled={rejectOrderLoading}
                             onClick={() => setOrderToReject(order)}
                         >
