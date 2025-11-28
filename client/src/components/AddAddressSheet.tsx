@@ -55,6 +55,9 @@ export function AddAddressSheet({
     }
 
     const handleOnSubmit = async () => {
+        if (!name || !name.trim()) {
+            return;
+        }
         const func = !address ? addAddress : editAddress;
         await func({id, name, fullAddress, comments}).unwrap();
         setOpened(false)
@@ -93,7 +96,7 @@ export function AddAddressSheet({
                         className="text-xl font-bold text-tg-theme-text-color text-left">{address ? 'Editing' : 'Adding'} address</SheetTitle>
                 </SheetHeader>
                 <div className="flex flex-col gap-4 mt-4 mb-4">
-                    <InputWithLabel label="Name" value={name}
+                    <InputWithLabel label="Name *" value={name}
                                     onChange={e => setAddress(prevState => ({...prevState, name: e.target.value}))}/>
                     <div className="flex gap-2 items-end">
                         <InputWithLabel label="Address" value={fullAddress}
@@ -115,6 +118,7 @@ export function AddAddressSheet({
                         size="lg"
                         loading={!address ? addLoading : editLoading}
                         onClick={handleOnSubmit}
+                        disabled={!name || !name.trim()}
                     >
                         Save
                     </Button>

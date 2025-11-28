@@ -2,6 +2,7 @@ import {Body, Controller, Delete, Get, Param, Post, Put, Query, Req, UseGuards} 
 import {Address} from "@prisma/client";
 import {AddressesService} from "./address.service";
 import {AuthGuard} from "@nestjs/passport";
+import {CreateAddressDto, UpdateAddressDto} from "./dto/create-address.dto";
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('/api/addresses')
@@ -16,13 +17,13 @@ export class AddressesController {
     }
 
     @Post('')
-    addAddress(@Body() {id, ...body}: Address, @Req() req): any {
+    addAddress(@Body() body: CreateAddressDto, @Req() req): any {
         return this.addressesService.create({...body, userId: req.user.id});
     }
 
     @Put('/:id')
-    editAddress(@Param('id') id: number, @Body() body: any, @Req() req): any {
-        return this.addressesService.update({...body, userId: req.user.id});
+    editAddress(@Param('id') id: number, @Body() body: UpdateAddressDto, @Req() req): any {
+        return this.addressesService.update({...body, id: Number(id), userId: req.user.id});
     }
 
     @Delete('/:id')
