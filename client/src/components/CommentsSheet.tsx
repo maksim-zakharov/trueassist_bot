@@ -20,30 +20,24 @@ export function CommentsSheet({
     const [_text, setText] = React.useState<string | undefined>(text);
     const [_opened, setOpened] = React.useState(false);
 
-    const clearState = () => setText(undefined)
-
+    // Синхронизируем локальное состояние с пропсом только при открытии окна
     useEffect(() => {
-        if (text) {
-            setText(text);
-            setOpened(true);
-        } else {
-            clearState();
+        if (_opened) {
+            setText(text || '');
         }
-    }, [text]);
+    }, [_opened, text]);
 
     const handleOpenChange = (opened: boolean) => {
-        opened ? vibro() : null;
-        setOpened(opened)
-        if (!opened) {
-            onChangeText(undefined);
+        if (opened) {
+            vibro();
+            setText(text || '');
         }
+        setOpened(opened);
     }
-
 
     const handleOnSubmit = async () => {
         onChangeText(_text);
-        setOpened(false)
-        clearState();
+        setOpened(false);
     }
 
     return (
@@ -56,7 +50,7 @@ export function CommentsSheet({
                     <SheetTitle className="text-xl font-bold text-tg-theme-text-color text-left">{label}</SheetTitle>
                 </SheetHeader>
                 <div className="flex flex-col flex-1">
-                    <Textarea value={text} onChange={e => setText(e.target.value)}
+                    <Textarea value={_text || ''} onChange={e => setText(e.target.value)}
                               className="mt-2 mb-2 rounded-md resize-none text-[16px]" rows={4}/>
                 </div>
                 <div className="flex flex-col flex-1">
