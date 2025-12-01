@@ -100,4 +100,8 @@ export class CreateOrderDto {
   @IsInt()
   @IsOptional()
   bonus?: number;
+
+  @IsString()
+  @IsOptional()
+  comment?: string;
 }

@@ -1,6 +1,6 @@
 import {Injectable, InternalServerErrorException} from '@nestjs/common';
 import {PrismaService} from '../prisma.service';
-import {Address} from '@prisma/client';
+import {Address, Prisma} from '@prisma/client';
 
 @Injectable()
 export class AddressesService {
@@ -19,7 +19,7 @@ export class AddressesService {
         })
     }
 
-    async create(data: Omit<Address, 'id'>): Promise<Address> {
+    async create(data: Prisma.AddressCreateInput): Promise<Address> {
         try {
             return this.prisma.address.create({
                 data,
@@ -29,11 +29,12 @@ export class AddressesService {
         }
     }
 
-    async update(data: Address): Promise<Address> {
+    async update(data: { id: number; userId: string } & Prisma.AddressUpdateInput): Promise<Address> {
         try {
+            const { id, userId, ...updateData } = data;
             return this.prisma.address.update({
-                data,
-                where: {id: data.id, userId: data.userId},
+                data: updateData,
+                where: { id, userId },
             });
         } catch (error) {
             throw new InternalServerErrorException('Failed to update address');

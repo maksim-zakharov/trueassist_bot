@@ -170,6 +170,7 @@ export class OrdersService {
             fullAddress: data.fullAddress,
             serviceVariantId: data.serviceVariant.id,
             bonus: data.bonus,
+            comment: data.comment,
             options: {
               connect: data.options?.map(({ id }) => ({ id })) || [],
             },
