@@ -25,14 +25,15 @@ function generateHourlySlotsForDay(dayTimestamp: number, intervalHours: number =
 
     // Начало дня (00:00)
     const startOfDay = dayjs(dayTimestamp).startOf('day');
-    // Конец дня (23:59)
-    const endOfDay = dayjs(dayTimestamp).endOf('day');
+    // Ограничиваем время с 8:00 до 21:00 включительно
+    const minTime = startOfDay.hour(8).minute(0).second(0);
+    const maxTime = startOfDay.hour(21).minute(0).second(0);
 
     const slots: number[] = [];
-    let currentSlot = startOfDay;
+    let currentSlot = minTime;
 
-    // Генерируем слоты с интервалом в intervalHours часов
-    while (currentSlot.isBefore(endOfDay) || currentSlot.isSame(endOfDay)) {
+    // Генерируем слоты с интервалом в intervalHours часов до 21:00 включительно
+    while (currentSlot.isBefore(maxTime) || currentSlot.isSame(maxTime)) {
         // Проверяем, что слот не раньше чем через 3 часа от текущего времени
         if (currentSlot.isAfter(threeHoursFromNow)) {
             slots.push(currentSlot.valueOf());
