@@ -27,6 +27,7 @@ import {Skeleton} from "../../components/ui/skeleton.tsx";
 import {ScheduleSheet} from "../../components/ScheduleSheet.tsx";
 import {CommentsSheet} from "../../components/CommentsSheet.tsx";
 import {AddressSheet} from "../../components/AddressSheet.tsx";
+import {AddAddressSheet} from "../../components/AddAddressSheet.tsx";
 import {selectBaseService} from "../../slices/createOrderSlice.ts";
 import {useDispatch} from "react-redux";
 import {AlertDialogWrapper} from "../../components/AlertDialogWrapper.tsx";
@@ -45,6 +46,7 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean; isExecutor?: boolean; }> 
     const [rejectExecutorOrder, {isLoading: rejectOrderLoading}] = useRejectExecutorOrderMutation();
     const [orderToDelete, setOrderToDelete] = useState<any | null>(null);
     const [orderToReject, setOrderToReject] = useState<any | null>(null);
+    const [editedAddress, setEditedAddress] = useState<any | undefined>(undefined);
     const [restore, {isLoading: restoreLoading}] = useRestoreAdminOrderMutation();
     const [patchOrder] = (isAdmin ? usePatchAdminOrderMutation : isExecutor ? usePatchExecutorOrderMutation : usePatchOrderMutation)();
     const [cancelOrder, {isLoading: cancelLoading}] = (isAdmin ? useCancelAdminOrderMutation : useCancelOrderMutation)();
@@ -86,6 +88,13 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean; isExecutor?: boolean; }> 
     const handleSelectAddress = async ({fullAddress}: any) => {
         if (fullAddress !== order.fullAddress)
             await patchOrder({id: order.id, fullAddress}).unwrap();
+    }
+
+    const handleAddressChange = async (address: any) => {
+        if (address && address.fullAddress && address.fullAddress !== order.fullAddress) {
+            await patchOrder({id: order.id, fullAddress: address.fullAddress}).unwrap();
+        }
+        setEditedAddress(address);
     }
 
     const handleSelectDate = async (date: number) => {
@@ -280,12 +289,23 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean; isExecutor?: boolean; }> 
                             <Typography.Description>{t('address')}</Typography.Description>
                             <Typography.Title>{order.fullAddress}</Typography.Title>
                         </div>
-                        {canEdit || canEditByExecutor && <AddressSheet
+                        {canEdit && <AddressSheet
                             addresses={addresses}
                             onAddressSelect={handleSelectAddress}
                         >
                             <EditButton/>
                         </AddressSheet>}
+                        {canEditByExecutor && <AddAddressSheet
+                            address={editedAddress || (order.fullAddress ? {
+                                id: -1,
+                                name: '',
+                                fullAddress: order.fullAddress,
+                                comments: ''
+                            } : undefined)}
+                            onChangeAddress={handleAddressChange}
+                        >
+                            <EditButton/>
+                        </AddAddressSheet>}
                     </div>
                 </div>
                 <div className="p-3 pl-0 flex gap-2 flex-col">
