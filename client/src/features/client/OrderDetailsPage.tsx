@@ -27,7 +27,6 @@ import {Skeleton} from "../../components/ui/skeleton.tsx";
 import {ScheduleSheet} from "../../components/ScheduleSheet.tsx";
 import {CommentsSheet} from "../../components/CommentsSheet.tsx";
 import {AddressSheet} from "../../components/AddressSheet.tsx";
-import {AddAddressSheet} from "../../components/AddAddressSheet.tsx";
 import {selectBaseService} from "../../slices/createOrderSlice.ts";
 import {useDispatch} from "react-redux";
 import {AlertDialogWrapper} from "../../components/AlertDialogWrapper.tsx";
@@ -39,6 +38,44 @@ import {OrderStatusText} from "../../components/OrderStatusText.tsx";
 import {useBackButton} from "../../hooks/useTelegram.tsx";
 import {toast} from "sonner";
 
+type Person = {
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    photoUrl?: string;
+};
+
+type OrderOption = {
+    id: number;
+    price: number;
+    name?: string;
+};
+
+type ServiceVariant = {
+    id?: number;
+    basePrice?: number;
+};
+
+type BaseService = {
+    id?: number;
+    name?: string;
+};
+
+type Order = {
+    id: number | string;
+    status?: string;
+    options: OrderOption[];
+    serviceVariant?: ServiceVariant;
+    bonus?: number;
+    fullAddress?: string;
+    date: number;
+    comment?: string;
+    managerComment?: string;
+    baseService?: BaseService;
+    user?: Person;
+    executor?: Person;
+};
+
 export const OrderDetailsPage: FC<{ isAdmin?: boolean; isExecutor?: boolean; }> = ({isAdmin, isExecutor}) => {
     const {t} = useTranslation();
     const [completeOrder, {isLoading: completeOrderLoading}] = useCompleteOrderMutation();
@@ -46,7 +83,6 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean; isExecutor?: boolean; }> 
     const [rejectExecutorOrder, {isLoading: rejectOrderLoading}] = useRejectExecutorOrderMutation();
     const [orderToDelete, setOrderToDelete] = useState<any | null>(null);
     const [orderToReject, setOrderToReject] = useState<any | null>(null);
-    const [editedAddress, setEditedAddress] = useState<any | undefined>(undefined);
     const [restore, {isLoading: restoreLoading}] = useRestoreAdminOrderMutation();
     const [patchOrder] = (isAdmin ? usePatchAdminOrderMutation : isExecutor ? usePatchExecutorOrderMutation : usePatchOrderMutation)();
     const [cancelOrder, {isLoading: cancelLoading}] = (isAdmin ? useCancelAdminOrderMutation : useCancelOrderMutation)();
@@ -55,7 +91,15 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean; isExecutor?: boolean; }> 
     const dispatch = useDispatch();
     const {data: addresses = []} = useGetAddressesQuery();
     const {id} = useParams<string>();
-    const {data: order, isLoading, isError} = (isAdmin ? useGetAdminOrderByIdQuery : isExecutor ? useGetOrderByIdFromExecutorQuery : useGetOrderByIdQuery)({id: id!});
+    const {
+        data: order,
+        isLoading,
+        isError
+    } = (isAdmin ? useGetAdminOrderByIdQuery : isExecutor ? useGetOrderByIdFromExecutorQuery : useGetOrderByIdQuery)({id: id!}) as {
+        data?: Order;
+        isLoading: boolean;
+        isError: boolean;
+    };
     const [{title, description, show}, setAlertConfig] = useState({
         title: '',
         description: '',
@@ -79,42 +123,62 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean; isExecutor?: boolean; }> 
         }, id => id === 'ok' && restore({id: order?.id}).unwrap())
     }
 
-    const canEditByExecutor = isExecutor && Boolean(order?.status) && !['completed', 'canceled', 'todo'].includes(order?.status);
-    const canEdit = isAdmin || !isExecutor && Boolean(order?.status) && ['todo'].includes(order?.status);
+    const orderStatus = order?.status ?? '';
+    const canEditByExecutor = isExecutor && Boolean(orderStatus) && !['completed', 'canceled', 'todo'].includes(orderStatus);
+    const canEdit = isAdmin || !isExecutor && Boolean(orderStatus) && ['todo'].includes(orderStatus);
 
-    const totalPrice = useMemo(() => order?.options.reduce((sum, option) => sum + option.price, order?.serviceVariant?.basePrice || 0) || 0, [order]);
-    const totalWithBonus = useMemo(() => totalPrice - (order?.bonus || 0), [totalPrice, order?.bonus]);
-
-    const handleSelectAddress = async ({fullAddress}: any) => {
+    const handleSelectAddress = async ({fullAddress}: { fullAddress?: string }) => {
+        if (!order) {
+            return;
+        }
         if (fullAddress !== order.fullAddress)
             await patchOrder({id: order.id, fullAddress}).unwrap();
     }
 
-    const handleAddressChange = async (address: any) => {
-        if (address && address.fullAddress && address.fullAddress !== order.fullAddress) {
-            await patchOrder({id: order.id, fullAddress: address.fullAddress}).unwrap();
+    const handleChangeAddress = async (fullAddress?: string) => {
+        if (!order) {
+            return;
         }
-        setEditedAddress(address);
+        if (fullAddress && fullAddress !== order.fullAddress) {
+            await patchOrder({id: order.id, fullAddress}).unwrap();
+        }
     }
 
     const handleSelectDate = async (date: number) => {
+        if (!order) {
+            return;
+        }
         if (date !== order.date)
             await patchOrder({id: order.id, date}).unwrap();
     }
 
     const handleChangeComment = async (comment?: string) => {
+        if (!order) {
+            return;
+        }
         if (comment && comment !== order.comment)
             await patchOrder({id: order.id, comment}).unwrap();
     }
 
     const handleChangeManagerComment = async (managerComment?: string) => {
+        if (!order) {
+            return;
+        }
         if (managerComment && managerComment !== order.managerComment)
             await patchOrder({id: order.id, managerComment}).unwrap();
     }
 
     const handleAddOptionClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+        if (!order) {
+            return;
+        }
         e.stopPropagation()
-        dispatch(selectBaseService(order))
+        dispatch(selectBaseService({
+            id: typeof order.id === 'number' ? order.id : Number(order.id),
+            baseService: order.baseService,
+            serviceVariant: order.serviceVariant,
+            options: order.options
+        }))
         navigate(isAdmin ? RoutePaths.Admin.Order.Create : RoutePaths.Order.Create)
     }
 
@@ -124,12 +188,18 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean; isExecutor?: boolean; }> 
     }
 
     const handleCancelClick = async () => {
+        if (!order) {
+            return;
+        }
         await cancelOrder({id: order.id}).unwrap();
         setAlertConfig(prevState => ({...prevState, show: false}));
         setTimeout(() => setAlertConfig(prevState => ({...prevState, title: '', description: ''})), 300);
     }
 
     const handleCloseClick = () => {
+        if (!order) {
+            return;
+        }
         Telegram.WebApp.showPopup({
             title: `${t('client_order_details_cancel_title')} ${dayjs.utc(order.date).local().format('dd, D MMMM HH:mm')}?`,
             message: t('client_order_details_cancel_description'),
@@ -145,7 +215,7 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean; isExecutor?: boolean; }> 
         }, id => id === 'cancel' && handleCancelClick())
     }
 
-    const handleApplyJob = async (order) => {
+    const handleApplyJob = async (order: Order) => {
         try {
             await processedOrder(order).unwrap()
         } catch (e: any) {
@@ -160,7 +230,7 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean; isExecutor?: boolean; }> 
         }
     }
 
-    const handleFinishOrder = async (order) => {
+    const handleFinishOrder = async (order: Order) => {
         await completeOrder(order).unwrap();
         setOrderToDelete(undefined);
         toast(t('orders_notification_complete'), {
@@ -172,7 +242,7 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean; isExecutor?: boolean; }> 
         navigate(RoutePaths.Executor.Orders)
     }
 
-    const handleRejectOrder = async (order) => {
+    const handleRejectOrder = async (order: Order) => {
         try {
             await rejectExecutorOrder(order).unwrap();
             toast(t('executor_order_reject_success'));
@@ -240,7 +310,7 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean; isExecutor?: boolean; }> 
                         <Typography.Title>
                             №{order.id}
                         </Typography.Title>
-                        <Typography.Title><OrderStatusText status={order.status}/></Typography.Title>
+                        <Typography.Title><OrderStatusText status={order.status ?? ''}/></Typography.Title>
                     </div>
                 </div>
                 <div className="p-3 pl-0 flex gap-2 flex-col">
@@ -276,7 +346,7 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean; isExecutor?: boolean; }> 
                             <Typography.Title>{dayjs.utc(order.date).local().format('HH:mm')}</Typography.Title>
                         </div>
                         {canEdit || canEditByExecutor && <ScheduleSheet serviceVariantId={order?.serviceVariant?.id}
-                                                                        optionIds={order?.options.map(o => o.id)}
+                                                                        optionIds={order?.options.map((option: OrderOption) => option.id)}
                                                                         selectedTimestamp={dayjs.utc(order.date).valueOf()}
                                                                         onSelectDate={handleSelectDate}>
                             <EditButton/>
@@ -287,25 +357,23 @@ export const OrderDetailsPage: FC<{ isAdmin?: boolean; isExecutor?: boolean; }> 
                     <div className="flex justify-between items-center">
                         <div className="flex flex-col">
                             <Typography.Description>{t('address')}</Typography.Description>
-                            <Typography.Title>{order.fullAddress}</Typography.Title>
+                            <Typography.Title>{order.fullAddress ?? ''}</Typography.Title>
                         </div>
-                        {canEdit && <AddressSheet
+                        {canEdit && !isAdmin && <AddressSheet
                             addresses={addresses}
                             onAddressSelect={handleSelectAddress}
                         >
                             <EditButton/>
                         </AddressSheet>}
-                        {canEditByExecutor && <AddAddressSheet
-                            address={editedAddress || (order.fullAddress ? {
-                                id: -1,
-                                name: '',
-                                fullAddress: order.fullAddress,
-                                comments: ''
-                            } : undefined)}
-                            onChangeAddress={handleAddressChange}
-                        >
-                            <EditButton/>
-                        </AddAddressSheet>}
+                        {(canEditByExecutor || (canEdit && isAdmin)) && (
+                            <CommentsSheet
+                                label={t('address')}
+                                text={order.fullAddress}
+                                onChangeText={handleChangeAddress}
+                            >
+                                <EditButton/>
+                            </CommentsSheet>
+                        )}
                     </div>
                 </div>
                 <div className="p-3 pl-0 flex gap-2 flex-col">
