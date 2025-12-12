@@ -109,12 +109,15 @@ export class ServicesService {
       );
       if (optionsToUpdate.length > 0) {
         await Promise.all(
-          optionsToUpdate.map((option) =>
-            tx.serviceOption.update({
+          optionsToUpdate.map((option) => {
+            const newOptionData = data.options.find((o) => o.id === option.id);
+            if (!newOptionData) return Promise.resolve();
+            const { id, ...optionData } = newOptionData;
+            return tx.serviceOption.update({
               where: { id: option.id },
-              data: option,
-            }),
-          ),
+              data: optionData,
+            });
+          }),
         );
       }
 
@@ -124,12 +127,15 @@ export class ServicesService {
       );
       if (variantsToUpdate.length > 0) {
         await Promise.all(
-          variantsToUpdate.map((option) =>
-            tx.serviceVariant.update({
-              where: { id: option.id },
-              data: option,
-            }),
-          ),
+          variantsToUpdate.map((variant) => {
+            const newVariantData = data.variants.find((v) => v.id === variant.id);
+            if (!newVariantData) return Promise.resolve();
+            const { id, ...variantData } = newVariantData;
+            return tx.serviceVariant.update({
+              where: { id: variant.id },
+              data: variantData,
+            });
+          }),
         );
       }
 

@@ -1,6 +1,6 @@
 import {Header} from "../../components/ui/Header.tsx";
 import {Typography} from "../../components/ui/Typography.tsx";
-import React, {FC, useEffect} from "react";
+import {FC, useEffect} from "react";
 import {InputWithLabel} from "../../components/InputWithLabel.tsx";
 import {BottomActions} from "../../components/BottomActions.tsx";
 import {Button} from "../../components/ui/button.tsx";
@@ -18,6 +18,7 @@ import {toast} from "sonner";
 import {RoutePaths} from "../../routes.ts";
 import {useNavigate, useParams} from "react-router-dom";
 import {useBackButton} from "../../hooks/useTelegram.tsx";
+import {IconPicker} from "../../components/IconPicker.tsx";
 
 interface Option {
     id: number,
@@ -29,6 +30,8 @@ interface Option {
 interface ServiceVariant {
     id: number,
     name: string,
+    nameAccusative?: string,
+    icon?: string,
     basePrice: number,
     duration: number
 }
@@ -43,6 +46,8 @@ const createEmptyOption = () => ({
 const createEmptyVariant = () => ({
     id: Date.now(),
     name: '',
+    nameAccusative: '',
+    icon: '',
     basePrice: 0,
     duration: 0
 } as ServiceVariant)
@@ -58,6 +63,8 @@ const schema = yup.object({
     variants: yup.array().of(yup.object({
         id: yup.number().optional(),
         name: yup.string().required(),
+        nameAccusative: yup.string().optional(),
+        icon: yup.string().optional(),
         basePrice: yup.number().required(),
         duration: yup.number().required(),
     })),
@@ -65,10 +72,10 @@ const schema = yup.object({
 
 export const AdminEditServicePage: FC<{isEdit?: boolean}> = ({isEdit}) => {
     const {id} = useParams<string>();
-    const backTo = () => navigate(isEdit ? RoutePaths.Admin.Services.Details(id) : RoutePaths.Admin.Services.List)
+    const backTo = () => navigate(isEdit && id ? RoutePaths.Admin.Services.Details(id) : RoutePaths.Admin.Services.List)
     useBackButton(backTo);
-    const {data: service} = useGetAdminServicesByIdQuery({id: Number(id)}, {
-        skip: !isEdit
+    const {data: service} = useGetAdminServicesByIdQuery({id: Number(id || 0)}, {
+        skip: !isEdit || !id
     })
     const navigate = useNavigate()
     const { handleSubmit, control, getValues, reset, register } = useForm({
@@ -99,9 +106,9 @@ export const AdminEditServicePage: FC<{isEdit?: boolean}> = ({isEdit}) => {
     const [addService, {isLoading: addIsLoading}] = useAddAdminServiceMutation();
     const [editService, {isLoading: editIsLoading}] = useEditAdminServiceByIdMutation();
 
-    const onSubmit = async data => {
+    const onSubmit = async (data: any) => {
         const func = isEdit ? editService : addService;
-        const newService = await func(data).unwrap();
+        await func(data).unwrap();
 
         toast(`Service ${isEdit ? 'edited' : 'added'}`, {
             classNames: {
@@ -148,6 +155,22 @@ export const AdminEditServicePage: FC<{isEdit?: boolean}> = ({isEdit}) => {
                     <Button variant="ghost" className="absolute right-0 text-tg-theme-hint-color h-[16px]" onClick={() => removeVariant(index)}><Trash2 className="h-4 w-4" /></Button>
                     <div className="flex flex-col" key={o.id}>
                         <InputWithLabel label="Name" {...register(`variants.${index}.name`)}/>
+                    </div>
+                    <div className="flex flex-col">
+                        <InputWithLabel label="Name Accusative" {...register(`variants.${index}.nameAccusative`)} placeholder="генеральную уборку"/>
+                    </div>
+                    <div className="flex flex-col">
+                        <IconPicker
+                            label="Icon"
+                            value={getValues(`variants.${index}.icon`) || ''}
+                            onChange={(iconName) => {
+                                const currentValues = getValues();
+                                if (currentValues.variants && currentValues.variants[index]) {
+                                    currentValues.variants[index].icon = iconName;
+                                    reset(currentValues);
+                                }
+                            }}
+                        />
                     </div>
                     <div className="flex flex-col">
                         <InputWithLabel label="BasePrice" {...register(`variants.${index}.basePrice`)}/>
