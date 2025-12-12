@@ -1,6 +1,6 @@
 import {useDispatch, useSelector} from "react-redux";
 import {Typography} from "../../components/ui/Typography.tsx";
-import React, {useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {
     BriefcaseBusiness,
     CalendarClock,
@@ -22,7 +22,7 @@ import {Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger} from "../../
 import {BottomActions} from "../../components/BottomActions.tsx";
 import {ListButton} from "@/components/ListButton/ListButton.tsx";
 import {ListButtonGroup} from "../../components/ListButton/ListButton.tsx";
-import {useGetApplicationQuery, useLoginMutation} from "../../api/api.ts";
+import {useGetApplicationQuery, useGetUserInfoQuery, useLoginMutation} from "../../api/api.ts";
 import {useTranslation} from "react-i18next";
 import {Skeleton} from "../../components/ui/skeleton.tsx";
 import {useBackButton} from "../../hooks/useTelegram.tsx";
@@ -32,14 +32,39 @@ import {ProfileSection, ProfileSkeleton} from "../../components/ProfileSection.t
 export const ProfilePage = () => {
     const {t} = useTranslation();
     const dispatch = useDispatch();
-    const [loginMutation, {isLoading}] = useLoginMutation();
+    const [loginMutation, {isLoading: isLoginLoading}] = useLoginMutation();
     const {data: application, isLoading: applicationLoading} = useGetApplicationQuery();
+    const {isFetching: isUserInfoFetching} = useGetUserInfoQuery(undefined, {
+        skip: false
+    });
     const [show, setShow] = useState(false);
     const navigate = useNavigate()
     useBackButton(() => navigate(RoutePaths.Root));
     const userInfo = useSelector(state => state.createOrder.userInfo);
     const address = useSelector(state => state.createOrder.geo?.address);
     const [writeAccessReceived, setWriteAccessReceived] = useState<boolean>(false)
+    const [isWaitingForRoleChange, setIsWaitingForRoleChange] = useState(false);
+    
+    // Отслеживаем, когда логин завершился и начался перезапрос userInfo
+    useEffect(() => {
+        if (isLoginLoading) {
+            setIsWaitingForRoleChange(true);
+        }
+    }, [isLoginLoading]);
+    
+    // Когда userInfo обновился (перезапрос завершен), сбрасываем флаг
+    useEffect(() => {
+        if (isWaitingForRoleChange && !isUserInfoFetching && !isLoginLoading) {
+            // Небольшая задержка, чтобы App.tsx успел сделать редирект
+            const timer = setTimeout(() => {
+                setIsWaitingForRoleChange(false);
+            }, 100);
+            return () => clearTimeout(timer);
+        }
+    }, [isWaitingForRoleChange, isUserInfoFetching, isLoginLoading]);
+    
+    // Показываем скелетон если идет загрузка или ожидается смена роли
+    const isLoading = applicationLoading || isLoginLoading || isWaitingForRoleChange;
 
     const phoneText = useMemo(() => {
         if (!userInfo?.phone) {
@@ -114,8 +139,23 @@ export const ProfilePage = () => {
         }
     }
 
-    const handleLogin = () => loginMutation(userInfo?.role === 'client' ? 'executor' : 'client').unwrap()
-    const handleAdminLogin = () => loginMutation(userInfo?.role !== 'admin' ? 'admin' : 'client').unwrap()
+    const handleLogin = async () => {
+        setIsWaitingForRoleChange(true);
+        try {
+            await loginMutation(userInfo?.role === 'client' ? 'executor' : 'client').unwrap();
+        } catch (error) {
+            setIsWaitingForRoleChange(false);
+        }
+    }
+    
+    const handleAdminLogin = async () => {
+        setIsWaitingForRoleChange(true);
+        try {
+            await loginMutation(userInfo?.role !== 'admin' ? 'admin' : 'client').unwrap();
+        } catch (error) {
+            setIsWaitingForRoleChange(false);
+        }
+    }
 
     if (applicationLoading || isLoading) {
         return <div className="flex flex-col gap-6 p-4">
