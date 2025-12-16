@@ -237,7 +237,15 @@ export const OrderCheckoutPage = () => {
                 <div className="flex items-center gap-2">
                     <Checkbox id="terms" checked={isAssepted} onCheckedChange={e => setAssepted(Boolean(e))}/>
                     <label htmlFor="terms" className="text-sm text-tg-theme-text-color">
-                        {t('client_accept_1')} <span className="text-tg-theme-link-color">{t('client_accept_2')}</span>
+                        {t('client_accept_1')}{" "}
+                        <a
+                            href="https://trueassist.ae/terms_of_service"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-tg-theme-link-color"
+                        >
+                            {t('client_accept_2')}
+                        </a>
                     </label>
                 </div>
             </div>
