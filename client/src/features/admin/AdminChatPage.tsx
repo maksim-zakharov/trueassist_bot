@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from "react";
+import {useMemo, useState} from "react";
 import {List} from "../../components/ui/list.tsx";
 import {User} from "lucide-react";
 import {Avatar, AvatarFallback, AvatarImage} from "../../components/ui/avatar.tsx";
@@ -8,6 +8,22 @@ import {RoutePaths} from "../../routes.ts";
 import {useNavigate} from "react-router-dom";
 import {Input} from "../../components/ui/input.tsx";
 
+const formatChatDate = (dialog: any): string => {
+    const lastMessage = dialog.messages && dialog.messages.length > 0 
+        ? dialog.messages[dialog.messages.length - 1]
+        : null;
+    
+    const messageDate = lastMessage 
+        ? dayjs.utc(lastMessage.date * 1000).local()
+        : dayjs.utc(dialog.date).local();
+    
+    const isToday = messageDate.isSame(dayjs(), 'day');
+    
+    return isToday 
+        ? messageDate.format('HH:mm')
+        : messageDate.format('DD.MM.YYYY');
+};
+
 export const AdminChatPage = () => {
     const navigate = useNavigate()
 
@@ -15,7 +31,24 @@ export const AdminChatPage = () => {
 
     const [search, setSearch] = useState<string>('');
 
-    const filteredChats = useMemo(() => dialogs.filter(d => !search || d.user.firstName.toLowerCase().includes(search.toLowerCase()) || (d.user.lastName && d.user.lastName.toLowerCase().includes(search.toLowerCase()))), [dialogs, search])
+    const filteredChats = useMemo(() => {
+        const filtered = dialogs.filter(d => !search || d.user.firstName.toLowerCase().includes(search.toLowerCase()) || (d.user.lastName && d.user.lastName.toLowerCase().includes(search.toLowerCase())));
+        
+        // Сортируем по дате последнего сообщения (новые вверху)
+        return filtered.sort((a, b) => {
+            const getLastMessageDate = (dialog: any) => {
+                if (dialog.messages && dialog.messages.length > 0) {
+                    return dialog.messages[dialog.messages.length - 1].date * 1000;
+                }
+                return new Date(dialog.date).getTime();
+            };
+            
+            const dateA = getLastMessageDate(a);
+            const dateB = getLastMessageDate(b);
+            
+            return dateB - dateA; // От новых к старым
+        });
+    }, [dialogs, search]);
 
     return <>
         <div className="p-4 px-2">
@@ -37,9 +70,7 @@ export const AdminChatPage = () => {
                     </span>
                         <span
                             className="text-[12px] [line-height:20px] [font-weight:400] text-tg-theme-subtitle-text-color truncate">
-                            {option.messages && option.messages.length > 0 
-                                ? dayjs.utc(option.messages[option.messages.length - 1].date * 1000).local().format('HH:mm')
-                                : dayjs.utc(option.date).local().format('HH:mm')}
+                            {formatChatDate(option)}
                         </span>
                     </div>
                     <div className="flex items-center gap-3 w-full justify-between">
