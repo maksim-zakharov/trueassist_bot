@@ -81,7 +81,7 @@
   "client_orders_repeat_btn": "Repeat",
 
   "client_order_details_cancel_title": "Cancel order",
-  "client_order_details_cancel_description": "Вы можете перенести уборку, если дата и время вам не подходят",
+  "client_order_details_cancel_description": "You can reschedule the cleaning if the date and time don't work for you",
   "client_order_details_reschedule_ok_btn": "Reschedule",
   "client_order_details_reschedule_cancel_btn": "Cancel",
 

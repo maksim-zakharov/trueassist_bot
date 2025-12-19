@@ -179,7 +179,7 @@ export class ChatService {
           client?.connected && client.send(JSON.stringify(newMessage)),
       );
     } else {
-      this.logger.error(`Чат ${message.chat.id.toString()} не найден`);
+      this.logger.error(`Chat ${message.chat.id.toString()} not found`);
     }
   }
 
@@ -240,9 +240,9 @@ export class ChatService {
       });
 
       await ctx.reply(
-        `👋 Добрый день, ${(message as any).chat.first_name} ${(message as any).chat.last_name}! В ближайшее время вам ответит наш оператор и поможет разобраться с любым вопросом.\n` +
+        `Hi, ${(message as any).chat.first_name} ${(message as any).chat.last_name}! Manager will reply shortly and help you with any questions.\n` +
           '\n' +
-          'Ожидайте, пожалуйста. 💙',
+          'Please wait',
       );
     }
 
@@ -338,9 +338,9 @@ export class ChatService {
       // Слать если: новые сообщения не прочитаны, переписка закрыта.
       if (!existChat.isUnread && !existChat.isStarted) {
         await ctx.reply(
-          `👋 Добрый день, ${(message as any).chat.first_name} ${(message as any).chat.last_name}! В ближайшее время вам ответит наш оператор и поможет разобраться с любым вопросом.\n` +
+          `Hi, ${(message as any).chat.first_name} ${(message as any).chat.last_name}! Manager will reply shortly and help you with any questions.\n` +
             '\n' +
-            'Ожидайте, пожалуйста. 💙',
+            'Please wait',
         );
         existChat.isUnread = true;
 
@@ -361,13 +361,13 @@ export class ChatService {
         admins.forEach((admin) =>
           this.bot.telegram.sendMessage(
             admin.id, // ID чата админа
-            `Пользователь ${message.from.first_name} (ID: ${message.chat.id}) начал диалог`,
+            `User ${message.from.first_name} (ID: ${message.chat.id}) started a chat.`,
             {
               reply_markup: {
                 inline_keyboard: [
                   [
                     {
-                      text: 'Открыть чат',
+                      text: 'Open chat',
                       web_app: {
                         url: `https://trueassist-bot-gpzkw.ondigitalocean.app/admin/chat/${message.chat.id}`,
                       },

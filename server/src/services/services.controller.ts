@@ -150,7 +150,7 @@ export class ServicesController implements OnModuleInit {
     });
 
     await ctx.replyWithMarkdown(
-      `Привет! Мы нашли ${executors.length} исполнителей для ${displayName}.`,
+      `Hi! We found ${executors.length} providers for ${displayName}.`,
       {
         // Ответ на конкретное сообщение
         reply_parameters: {
@@ -158,8 +158,8 @@ export class ServicesController implements OnModuleInit {
         },
         reply_markup: {
           inline_keyboard: [
-            [Markup.button.url('🔍 Выбрать исполнителя', url)],
-            [Markup.button.callback('❌ Не нужно, спасибо', 'delete_message')],
+            [Markup.button.url('🔍 Choose a professional', url)],
+            [Markup.button.callback('❌ No, thanks', 'delete_message')],
           ],
         },
       },

@@ -27,7 +27,7 @@ export const GiftsPage = () => {
                 url: inviteLink, // Опционально
             });
         } catch (error) {
-            console.error('Ошибка:', error);
+            console.error('Error:', error);
         }
     }
 

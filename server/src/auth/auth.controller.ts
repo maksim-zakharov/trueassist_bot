@@ -38,7 +38,7 @@ export class AuthController {
         // Действия с номером (сохранение в БД и т.д.)
         await this.userService.update(item);
       } else {
-        ctx.reply('Это не ваш номер!');
+        ctx.reply('This is not your number!');
       }
     });
   }

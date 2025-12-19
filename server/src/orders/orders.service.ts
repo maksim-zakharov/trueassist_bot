@@ -18,7 +18,7 @@ export class OrdersService {
     if (date < now) {
       throw new BusinessException(
         'INVALID_ORDER_DATE',
-        'Дата заказа не может быть в прошлом',
+        "The order date can't be in the past",
       );
     }
   }
