@@ -218,6 +218,12 @@ export const AdminChatDetailsPage = () => {
                 className="border-none rounded-3xl text-tg-theme-hint-color h-8 placeholder-[var(--tg-theme-hint-color)]"
                 value={message}
                 onChange={e => setMessage(e.target.value)}
+                onKeyDown={e => {
+                    if (e.key === 'Enter' && !e.shiftKey && message.trim()) {
+                        e.preventDefault();
+                        handleOnSubmit();
+                    }
+                }}
                     placeholder="Message"/>
                 <Button size="sm" className="border-none h-8 w-8 p-1.5 rounded-full" variant="primary" disabled={!message}
                         loading={isLoading} onClick={handleOnSubmit}><ArrowUp/></Button>
