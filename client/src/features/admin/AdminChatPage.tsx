@@ -37,7 +37,9 @@ export const AdminChatPage = () => {
                     </span>
                         <span
                             className="text-[12px] [line-height:20px] [font-weight:400] text-tg-theme-subtitle-text-color truncate">
-                            {dayjs.utc(option.date).local().format('HH:mm')}
+                            {option.messages && option.messages.length > 0 
+                                ? dayjs.utc(option.messages[option.messages.length - 1].date * 1000).local().format('HH:mm')
+                                : dayjs.utc(option.date).local().format('HH:mm')}
                         </span>
                     </div>
                     <div className="flex items-center gap-3 w-full justify-between">
