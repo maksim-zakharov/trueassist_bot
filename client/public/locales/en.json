@@ -127,5 +127,13 @@
   "bonuses_invites_empty_title": "It's empty right now",
   "bonuses_invites_empty_description": "Surely some of your friends are waiting for you to invite them to QLean",
 
-  "user_application_title": "Application"
+  "user_application_title": "Application",
+
+  "chat_photo_label": "Image",
+  "delete": "Delete",
+  "save": "Save",
+  "search_by_name": "Search by name",
+  "start_dialogue": "Start a dialogue",
+  "close_dialogue": "Close a dialogue",
+  "message_placeholder": "Message"
 }

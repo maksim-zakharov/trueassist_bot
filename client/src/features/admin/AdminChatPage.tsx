@@ -7,6 +7,7 @@ import {useGetAdminChatsQuery} from "../../api/ordersApi.ts";
 import {RoutePaths} from "../../routes.ts";
 import {useNavigate} from "react-router-dom";
 import {Input} from "../../components/ui/input.tsx";
+import {useTranslation} from "react-i18next";
 
 const formatChatDate = (dialog: any): string => {
     const lastMessage = dialog.messages && dialog.messages.length > 0 
@@ -25,6 +26,7 @@ const formatChatDate = (dialog: any): string => {
 };
 
 export const AdminChatPage = () => {
+    const {t} = useTranslation();
     const navigate = useNavigate()
 
     const {data: dialogs = []} = useGetAdminChatsQuery();
@@ -53,7 +55,7 @@ export const AdminChatPage = () => {
     return <>
         <div className="p-4 px-2">
             <Input value={search} onChange={e => setSearch(e.target.value)} className="border-none card-bg-color rounded-lg text-tg-theme-hint-color h-10 placeholder-[var(--tg-theme-hint-color)] text-center"
-                   placeholder="Search by name"/>
+                   placeholder={t('search_by_name')}/>
         </div>
         <List itemClassName="flex gap-2 p-2 root-bg-color" className="rounded-none">
             {filteredChats.map((option) => <div className="flex gap-3 w-full"
@@ -77,7 +79,7 @@ export const AdminChatPage = () => {
                     <span
                         className="text-[16px] [line-height:20px] [font-weight:400] text-tg-theme-subtitle-text-color truncate">
                         {option.messages[option.messages.length - 1]?.type === "PHOTO" && <div className="flex gap-1.5 h-5">
-                            <img src={`/api/admin/chat-assets/${option.messages[option.messages.length - 1]?.text}`}/> Изображение
+                            <img src={`/api/admin/chat-assets/${option.messages[option.messages.length - 1]?.text}`}/> {t('chat_photo_label')}
                         </div>}
                         {option.messages[option.messages.length - 1]?.type === "TEXT" && option.messages[option.messages.length - 1]?.text}
                     </span>

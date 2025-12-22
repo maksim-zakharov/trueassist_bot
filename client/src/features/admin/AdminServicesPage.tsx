@@ -68,7 +68,7 @@ export const AdminServicesPage = () => {
         <div className="px-4 pt-4 flex gap-2">
             <Input
                    className="border-none card-bg-color rounded-lg text-tg-theme-hint-color h-10 placeholder-[var(--tg-theme-hint-color)] text-center"
-                   placeholder="Search by name" value={query} onChange={e => setQuery(e.target.value)}/>
+                   placeholder={t('search_by_name')} value={query} onChange={e => setQuery(e.target.value)}/>
             <Button
                 onClick={() => navigate(RoutePaths.Admin.Services.Create)}
             >

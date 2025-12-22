@@ -17,8 +17,10 @@ import {io, Socket} from "socket.io-client";
 import {ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger} from "@/components/ui/context-menu.tsx";
 import {Avatar, AvatarFallback, AvatarImage} from "../../components/ui/avatar.tsx";
 import dayjs from "dayjs";
+import {useTranslation} from "react-i18next";
 
 const Message: FC<PropsWithChildren & { id: string, onDeleteMessage: any }> = ({children, id, onDeleteMessage}) => {
+    const {t} = useTranslation();
     const {vibro} = useTelegram();
 
     const handleOpenChange = (opened: boolean) => {
@@ -44,12 +46,13 @@ const Message: FC<PropsWithChildren & { id: string, onDeleteMessage: any }> = ({
     return <ContextMenu onOpenChange={handleOpenChange}>
         <ContextMenuTrigger>{children}</ContextMenuTrigger>
         <ContextMenuContent>
-            <ContextMenuItem onClick={handleDeleteClick}><Trash2 className="h-4 w-4 text-tg-theme-button-text-color"/>Удалить</ContextMenuItem>
+            <ContextMenuItem onClick={handleDeleteClick}><Trash2 className="h-4 w-4 text-tg-theme-button-text-color"/>{t('delete')}</ContextMenuItem>
         </ContextMenuContent>
     </ContextMenu>
 }
 
 export const AdminChatDetailsPage = () => {
+    const {t} = useTranslation();
     const [socket, setSocket] = useState<Socket | null>(null);
     const navigate = useNavigate();
     useBackButton(() => navigate(RoutePaths.Admin.Chat.List));
@@ -207,7 +210,7 @@ export const AdminChatDetailsPage = () => {
 {
     !dialog.isStarted && <BottomActions
         className="[padding-bottom:var(--tg-safe-area-inset-bottom)] [min-height:calc(84px + var(--tg-safe-area-inset-bottom))]">
-        <Button wide onClick={() => startChat({id}).unwrap()}>Start a dialogue</Button>
+        <Button wide onClick={() => startChat({id}).unwrap()}>{t('start_dialogue')}</Button>
     </BottomActions>
 }
 {
@@ -224,12 +227,12 @@ export const AdminChatDetailsPage = () => {
                         handleOnSubmit();
                     }
                 }}
-                    placeholder="Message"/>
+                    placeholder={t('message_placeholder')}/>
                 <Button size="sm" className="border-none h-8 w-8 p-1.5 rounded-full" variant="primary" disabled={!message}
                         loading={isLoading} onClick={handleOnSubmit}><ArrowUp/></Button>
             </div>
             <Button wide variant="default" size="lg"
-                    className="border-none" onClick={handleCloseChat}>Close a dialogue</Button>
+                    className="border-none" onClick={handleCloseChat}>{t('close_dialogue')}</Button>
         </BottomActions>}
     </div>
 }

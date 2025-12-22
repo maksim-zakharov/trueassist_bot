@@ -3,6 +3,7 @@ import React, {useEffect} from "react";
 import {useTelegram} from "../hooks/useTelegram.tsx";
 import {Textarea} from "./ui/textarea.tsx";
 import {Button} from "./ui/button.tsx";
+import {useTranslation} from "react-i18next";
 
 interface CommentsSheetProps {
     text?: string;
@@ -16,6 +17,7 @@ export function CommentsSheet({
                                   text,
                                   onChangeText
                               }: React.PropsWithChildren<CommentsSheetProps>) {
+    const {t} = useTranslation();
     const {vibro} = useTelegram();
     const [_text, setText] = React.useState<string | undefined>(text);
     const [_opened, setOpened] = React.useState(false);
@@ -59,7 +61,7 @@ export function CommentsSheet({
                         size="lg"
                         onClick={handleOnSubmit}
                     >
-                        Сохранить
+                        {t('save')}
                     </Button>
                 </div>
             </SheetContent>
