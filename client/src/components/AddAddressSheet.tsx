@@ -58,16 +58,31 @@ export function AddAddressSheet({
         if (!name || !name.trim()) {
             return;
         }
-        const func = !address ? addAddress : editAddress;
-        await func({id, name, fullAddress, comments}).unwrap();
-        setOpened(false)
-        clearAddress();
+        try {
+            if (!address) {
+                // Создание нового адреса - не передаем id
+                await addAddress({name, fullAddress, comments}).unwrap();
+            } else {
+                // Редактирование существующего адреса
+                await editAddress({id, name, fullAddress, comments}).unwrap();
+            }
+            setOpened(false);
+            clearAddress();
+            onChangeAddress(undefined);
+        } catch (error) {
+            console.error('Error saving address:', error);
+        }
     }
 
     const handleOnDelete = async () => {
-        await deleteAddress({id}).unwrap();
-        setOpened(false)
-        clearAddress();
+        try {
+            await deleteAddress({id}).unwrap();
+            setOpened(false);
+            clearAddress();
+            onChangeAddress(undefined);
+        } catch (error) {
+            console.error('Error deleting address:', error);
+        }
     }
 
     const handleMapClick = () => {
