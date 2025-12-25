@@ -71,6 +71,7 @@ export const LanguageSelector = () => {
                             <Checkbox 
                                 checked={currentLang === lang.code}
                                 onCheckedChange={() => handleLanguageChange(lang.code)}
+                                className={currentLang === lang.code ? '' : 'border-none'}
                             />
                         </div>
                     ))}
