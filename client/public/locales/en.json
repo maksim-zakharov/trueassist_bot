@@ -3,7 +3,7 @@
   "address": "Address",
   "telegram_notifications": "Telegram notifications",
 
-  "request_work_btn": "Start Earning with Qlean",
+  "request_work_btn": "Start Earning with True Assist",
   "login_as_btn": "Log in as",
   "logout_btn": "Log out",
 
@@ -12,9 +12,9 @@
   "profile_address_notavailable": "Not available",
 
   "new_application_title": "Join Us",
-  "new_application_description": "Access local service jobs, manage your schedule, and receive instant payouts. Your effort, your rules.",
+  "new_application_description": "Access local service jobs, manage your schedule, and receive instant payouts.",
   "new_application_first": "Get local service requests in your area – no client hunting required, even for newcomers.",
-  "new_application_second": "See your earnings upfront. Withdraw funds within 2 hours – zero hidden fees.",
+  "new_application_second": "See your earnings upfront.",
   "new_application_thirst": "Higher ratings boost your visibility. Earn trust, attract better clients, and grow your income.",
   "submit_application_btn": "Submit Application",
 
@@ -28,7 +28,7 @@
   "menu_item_profile": "Profile",
   "menu_item_gifts": "Bonuses",
 
-  "schedule_update_success": "Schedule saved!",
+  "schedule_update_success": "Schedule saved",
   "schedule_update_dayoff": "Day off",
 
   "error_refresh_btn": "Try again",
@@ -85,7 +85,7 @@
   "client_order_details_reschedule_ok_btn": "Reschedule",
   "client_order_details_reschedule_cancel_btn": "Cancel",
 
-  "client_order_details_executor_title": "Executor",
+  "client_order_details_executor_title": "Service Manager",
   "client_order_details_executor_status": "Searching",
   "client_order_details_comments_empty": "Empty",
 
@@ -121,11 +121,11 @@
   "bonuses_invites_title": "Bonuses",
   "bonuses_tabs_active": "Active",
   "bonuses_tabs_completed": "Completed",
-  "bonuses_title": "Recommend QLean \n and get bonuses",
-  "bonuses_description": "300 AED for you and 50 AED for friends",
+  "bonuses_title": "Recommend True Assist and get bonuses",
+  "bonuses_description": "50 AED for you and 20 AED for friends",
   "bonuses_recommended_btn": "Recommend",
   "bonuses_invites_empty_title": "It's empty right now",
-  "bonuses_invites_empty_description": "Surely some of your friends are waiting for you to invite them to QLean",
+  "bonuses_invites_empty_description": "Surely some of your friends are waiting for you to invite them to True Assist",
 
   "user_application_title": "Application",
 
