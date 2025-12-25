@@ -64,11 +64,17 @@ export const LanguageSelector = () => {
                             onClick={() => handleLanguageChange(lang.code)}
                         >
                             <div className="flex flex-col items-start w-full">
-                                <Typography.Title className="text-base font-medium">
-                                    {lang.nativeName}
-                                </Typography.Title>
-                                <Typography.Description className="text-xs text-tg-theme-hint-color">
+                                <Typography.Title className={`text-base font-medium ${
+                                    currentLang === lang.code ? 'text-tg-theme-button-text-color' : ''
+                                }`}>
                                     {lang.name}
+                                </Typography.Title>
+                                <Typography.Description className={`text-xs ${
+                                    currentLang === lang.code 
+                                        ? 'text-tg-theme-button-text-color opacity-80' 
+                                        : 'text-tg-theme-hint-color'
+                                }`}>
+                                    {lang.nativeName}
                                 </Typography.Description>
                             </div>
                             {currentLang === lang.code && (
