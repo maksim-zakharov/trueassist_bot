@@ -3,8 +3,8 @@ import {ListButton} from "./ListButton/ListButton.tsx";
 import {ChevronRight, Languages} from "lucide-react";
 import {useTranslation} from "react-i18next";
 import {useState} from "react";
-import {Button} from "./ui/button.tsx";
 import {Typography} from "./ui/Typography.tsx";
+import {Checkbox} from "./ui/checkbox.tsx";
 import i18n from "../i18n";
 
 interface LanguageOption {
@@ -55,32 +55,24 @@ export const LanguageSelector = () => {
                 </SheetHeader>
                 <div className="flex flex-col gap-2 mt-4">
                     {languages.map((lang) => (
-                        <Button
+                        <div
                             key={lang.code}
-                            variant={currentLang === lang.code ? "default" : "ghost"}
-                            className={`w-full justify-start text-left ${
-                                currentLang === lang.code ? 'bg-tg-theme-button-color' : ''
-                            }`}
+                            className="flex items-center justify-between w-full p-3 rounded-lg card-bg-color cursor-pointer active:opacity-70"
                             onClick={() => handleLanguageChange(lang.code)}
                         >
                             <div className="flex flex-col items-start w-full">
-                                <Typography.Title className={`text-base font-medium ${
-                                    currentLang === lang.code ? 'text-tg-theme-button-text-color' : ''
-                                }`}>
+                                <Typography.Title className="text-base font-medium">
                                     {lang.name}
                                 </Typography.Title>
-                                <Typography.Description className={`text-xs ${
-                                    currentLang === lang.code 
-                                        ? 'text-tg-theme-button-text-color opacity-80' 
-                                        : 'text-tg-theme-hint-color'
-                                }`}>
+                                <Typography.Description className="text-xs text-tg-theme-hint-color">
                                     {lang.nativeName}
                                 </Typography.Description>
                             </div>
-                            {currentLang === lang.code && (
-                                <div className="ml-auto w-2 h-2 rounded-full bg-tg-theme-button-text-color"/>
-                            )}
-                        </Button>
+                            <Checkbox 
+                                checked={currentLang === lang.code}
+                                onCheckedChange={() => handleLanguageChange(lang.code)}
+                            />
+                        </div>
                     ))}
                 </div>
             </SheetContent>
