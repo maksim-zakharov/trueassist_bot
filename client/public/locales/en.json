@@ -135,5 +135,8 @@
   "search_by_name": "Search by name",
   "start_dialogue": "Start a dialogue",
   "close_dialogue": "Close a dialogue",
-  "message_placeholder": "Message"
+  "message_placeholder": "Message",
+
+  "language": "Language",
+  "select_language": "Select language"
 }

@@ -135,5 +135,8 @@
   "search_by_name": "Поиск по имени",
   "start_dialogue": "Начать диалог",
   "close_dialogue": "Закрыть диалог",
-  "message_placeholder": "Сообщение"
+  "message_placeholder": "Сообщение",
+  
+  "language": "Язык",
+  "select_language": "Выберите язык"
 }

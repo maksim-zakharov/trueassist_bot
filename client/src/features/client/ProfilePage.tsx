@@ -28,6 +28,7 @@ import {Skeleton} from "../../components/ui/skeleton.tsx";
 import {useBackButton} from "../../hooks/useTelegram.tsx";
 import {ProfileApplicationCard} from "../../components/ProfileApplicationCard.tsx";
 import {ProfileSection, ProfileSkeleton} from "../../components/ProfileSection.tsx";
+import {LanguageSelector} from "../../components/LanguageSelector.tsx";
 
 export const ProfilePage = () => {
     const {t} = useTranslation();
@@ -208,6 +209,8 @@ export const ProfilePage = () => {
                             checked={writeAccessReceived}
                             onCheckedChange={handleRequestWriteAccess}
                         />}/>
+
+            <LanguageSelector/>
 
             {(!application || application.status !== 'APPROVED') && <Sheet open={show}>
                 <SheetTrigger asChild>

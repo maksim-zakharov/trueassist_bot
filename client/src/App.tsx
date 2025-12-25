@@ -19,6 +19,8 @@ import {ExecutorSchedulePage} from "./features/executor/ExecutorSchedulePage.tsx
 import {ApplicationPage} from "./features/client/ApplicationPage.tsx";
 import './i18n';
 import {useGeoLocation} from "./hooks/useGeoLocation.tsx";
+import {useEffect} from "react";
+import i18n from './i18n';
 import {AdminLayout} from "./components/layout/AdminLayout.tsx";
 import {GiftsPage} from "./features/client/GiftsPage.tsx";
 import {REF_HEADER} from "./api/baseQuery.ts";
@@ -41,6 +43,16 @@ function App() {
     const dispatch = useDispatch();
     const navigate = useNavigate()
     const startParam = Telegram.WebApp.initDataUnsafe.start_param || searchParams.get('tgWebAppStartParam') || searchParams.get('startapp') || '';
+
+    // Обработка параметра lang из URL (только если нет сохраненного языка)
+    useEffect(() => {
+        if (!localStorage.getItem('language')) {
+            const urlLang = searchParams.get('lang');
+            if (urlLang && (urlLang === 'en' || urlLang === 'ru')) {
+                i18n.changeLanguage(urlLang);
+            }
+        }
+    }, [searchParams]);
 
     useEffect(() => {
         const [key, refId] = startParam.split('ref_');
