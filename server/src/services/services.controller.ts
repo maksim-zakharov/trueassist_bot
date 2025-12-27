@@ -26,6 +26,25 @@ export class ServicesController implements OnModuleInit {
     private readonly openaiService: OpenaiService,
     private readonly chatService: ChatService,
   ) {
+    // Обработчик команды /start
+    bot.start(async (ctx) => {
+      try {
+        await ctx.reply(
+          `Welcome!
+To start, tap Open or t.me/trueassist_bot?startapp=
+Нажмите Open, чтобы начать или t.me/trueassist_bot?startapp=
+
+True Assist is an easy way to book home and business services: cleaning, nannies, pest control, gardening, AC services, moving, tutoring and maintenance. 
+Have questions? Write in the chat — our manager will help. 
+
+True Assist — простой способ заказать услуги для дома и бизнеса: уборка, няни, сад, кондиционеры, переезды, репетиторы и др.
+Есть вопросы — напишите в чат, менеджер поможет.`
+        );
+      } catch (error) {
+        this.logger.error('Start command error:', error);
+      }
+    });
+
     // Обработчик кнопки "Не нужно, спасибо"
     bot.action('delete_message', async (ctx) => {
       try {
