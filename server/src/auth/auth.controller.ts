@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Headers,
+  Logger,
   Param,
   Post,
   Req,
@@ -19,26 +20,51 @@ import { ApplicationService } from '../application/application.service';
 
 @Controller('/api/auth')
 export class AuthController {
+  private readonly logger = new Logger(AuthController.name);
+
   constructor(
     private readonly bot: Telegraf,
     private readonly authService: AuthService,
     private readonly userService: UserService,
     private readonly applicationService: ApplicationService,
   ) {
+    // Регистрируем обработчик контакта первым, чтобы он имел приоритет
     bot.on('contact', async (ctx) => {
-      const contact = ctx.message.contact;
+      try {
+        this.logger.log(`Contact received from user ${ctx.from.id}`);
+        const contact = ctx.message.contact;
 
-      // Проверка, что контакт принадлежит отправителю
-      if (contact.user_id === ctx.from.id) {
-        const phone = contact.phone_number;
-        const item = await this.userService.getById(ctx.from.id.toString());
+        // Проверка, что контакт принадлежит отправителю
+        if (contact.user_id === ctx.from.id) {
+          const phone = contact.phone_number;
+          this.logger.log(`Processing phone ${phone} for user ${ctx.from.id}`);
+          
+          let item = await this.userService.getById(ctx.from.id.toString());
 
-        item.phone = phone;
-
-        // Действия с номером (сохранение в БД и т.д.)
-        await this.userService.update(item);
-      } else {
-        ctx.reply('This is not your number!');
+          // Если пользователь не найден, создаем его
+          if (!item) {
+            this.logger.log(`User ${ctx.from.id} not found, creating new user`);
+            item = await this.userService.create({
+              id: ctx.from.id.toString(),
+              first_name: ctx.from.first_name || '',
+              last_name: ctx.from.last_name || '',
+              username: ctx.from.username,
+              phone_number: phone,
+            });
+            this.logger.log(`User ${ctx.from.id} created with phone ${phone}`);
+          } else {
+            this.logger.log(`Updating phone for user ${ctx.from.id}`);
+            item.phone = phone;
+            // Действия с номером (сохранение в БД и т.д.)
+            await this.userService.update(item);
+            this.logger.log(`Phone updated for user ${ctx.from.id}`);
+          }
+        } else {
+          this.logger.warn(`Contact user_id ${contact.user_id} does not match sender ${ctx.from.id}`);
+          ctx.reply('This is not your number!');
+        }
+      } catch (error) {
+        this.logger.error('Error handling contact:', error);
       }
     });
   }
@@ -60,16 +86,6 @@ export class AuthController {
     return this.authService.login(user, role);
   }
 
-  // @Patch('/phone')
-  // @UseGuards(AuthGuard('jwt'))
-  // async patchPhone(@Req() req, @Body() body: User) {
-  //     const item = await this.userService.getById(req.user.id);
-  //
-  //     if (body.phone)
-  //         item.phone = body.phone;
-  //
-  //     await this.userService.update(item);
-  // }
 
   @Get('/userinfo')
   @UseGuards(AuthGuard('jwt'))

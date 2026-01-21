@@ -87,6 +87,9 @@ export const ProfilePage = () => {
         if (!isRequested) {
             return;
         }
+        // После подтверждения контакт автоматически отправляется в бота,
+        // обработчик bot.on('contact') перехватывает и сохраняет его
+        // Перезагружаем страницу для обновления данных
         dispatch(logout())
         window.location.reload();
     })
