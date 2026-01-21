@@ -31,6 +31,18 @@ export class AuthController {
     // Регистрируем обработчик контакта первым, чтобы он имел приоритет
     bot.on('contact', async (ctx) => {
       try {
+        // Обрабатываем только личные сообщения, не группы
+        if (ctx.chat.type !== 'private') {
+          this.logger.warn(`Contact received in non-private chat: ${ctx.chat.type}, chat.id: ${ctx.chat.id}`);
+          return;
+        }
+
+        // Проверяем, что есть информация об отправителе
+        if (!ctx.from) {
+          this.logger.warn('Contact received but ctx.from is missing');
+          return;
+        }
+
         this.logger.log(`Contact received from user ${ctx.from.id}`);
         const contact = ctx.message.contact;
 
@@ -44,11 +56,15 @@ export class AuthController {
           // Если пользователь не найден, создаем его
           if (!item) {
             this.logger.log(`User ${ctx.from.id} not found, creating new user`);
+            
+            // Убеждаемся, что firstName не undefined (обязательное поле)
+            const firstName = ctx.from.first_name || 'Unknown';
+            
             item = await this.userService.create({
               id: ctx.from.id.toString(),
-              first_name: ctx.from.first_name || '',
-              last_name: ctx.from.last_name || '',
-              username: ctx.from.username,
+              first_name: firstName,
+              last_name: ctx.from.last_name || null,
+              username: ctx.from.username || null,
               phone_number: phone,
             });
             this.logger.log(`User ${ctx.from.id} created with phone ${phone}`);

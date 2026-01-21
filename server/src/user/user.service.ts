@@ -14,14 +14,17 @@ export class UserService {
 
   async create(data: any): Promise<User> {
     try {
+      // Убеждаемся, что firstName не undefined (обязательное поле)
+      const firstName = data.first_name || 'Unknown';
+      
       return this.prisma.user.create({
         data: {
           id: data.id.toString(),
-          firstName: data.first_name,
-          lastName: data.last_name,
-          photoUrl: data.photo_url,
-          phone: data.phone_number,
-          username: data.username,
+          firstName: firstName,
+          lastName: data.last_name || null,
+          photoUrl: data.photo_url || null,
+          phone: data.phone_number || null,
+          username: data.username || null,
         },
       });
     } catch (error) {
