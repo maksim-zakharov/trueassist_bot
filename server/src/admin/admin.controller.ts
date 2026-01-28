@@ -154,6 +154,12 @@ export class AdminController {
     return this.userService.getBonusOperations(id);
   }
 
+  @Delete('users/:id')
+  @UseGuards(AuthGuard('jwt'))
+  async deleteUser(@Param('id') id: string) {
+    await this.userService.deleteUser(id);
+  }
+
   @Post('users/:id/bonuses')
   @UseGuards(AuthGuard('jwt'))
   async addBonus(@Param('id') id: string, @Body() bonus: BonusOperation) {

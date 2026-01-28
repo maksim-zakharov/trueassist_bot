@@ -13,6 +13,7 @@ import {useBackButton} from "../../../hooks/useTelegram.tsx";
 import {Tabs, TabsList, TabsTrigger} from "../../../components/ui/tabs.tsx";
 import {AdminOrdersList} from "../../../components/AdminOrdersList.tsx";
 import {AdminApplicationTab} from "./AdminApplicationTab.tsx";
+import {AdminUserSettingsTab} from "./AdminUserSettingsTab.tsx";
 import {InvitesList} from "../../../components/InvitesList.tsx";
 import {BonusTotal, BonusTotalSkeleton} from "../../../components/BonusTotal.tsx";
 import {ProfileSection, ProfileSkeleton} from "../../../components/ProfileSection.tsx";
@@ -37,6 +38,10 @@ export const AdminUsersDetailsPage: FC = () => {
                 id: 'invites',
                 label: 'Bonuses'
             },
+            {
+                id: 'settings',
+                label: t('admin_user_settings_tab')
+            },
         ];
 
         if (application) {
@@ -48,7 +53,7 @@ export const AdminUsersDetailsPage: FC = () => {
         }
 
         return _tabs;
-    }, [application]);
+    }, [application, t]);
 
     const [selectedTab, setSelectedTab] = React.useState<string>(tabs[0].id);
 
@@ -96,5 +101,6 @@ export const AdminUsersDetailsPage: FC = () => {
 
         {selectedTab === 'application' && <AdminApplicationTab application={application}/>}
         {selectedTab === 'invites' && <InvitesList invites={bonuses} isSuccess={isSuccessInvites} isLoading={isLoadingInvites}/>}
+        {selectedTab === 'settings' && <AdminUserSettingsTab userId={user.id}/>}
     </div>
 }

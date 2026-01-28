@@ -110,6 +110,13 @@ export const ordersApi = createApi({
             }),
             providesTags: ['Invite'],
         }),
+        deleteAdminUserById: builder.mutation<void, { id: string }>({
+            query: (params) => ({
+                url: `/admin/users/${params.id}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: ['User', 'Order', 'Application', 'Invite', 'Chat'],
+        }),
         addBonus: builder.mutation<void, any>({
             query: (params) => ({
                 url: `/admin/users/${params.id}/bonuses`,
@@ -317,6 +324,7 @@ export const {
     useGetAdminBonusesByUserIdQuery,
     useGetAdminApplicationByUserIdQuery,
     useGetAdminUserByIdQuery,
+    useDeleteAdminUserByIdMutation,
     useGetAdminServicesByIdQuery,
     useGetOrderByIdFromExecutorQuery,
     usePatchOrderMutation,

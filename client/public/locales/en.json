@@ -128,6 +128,12 @@
   "bonuses_invites_empty_description": "Surely some of your friends are waiting for you to invite them to True Assist",
 
   "user_application_title": "Application",
+  "admin_user_settings_tab": "Settings",
+  "admin_user_delete_btn": "Delete",
+  "admin_user_delete_confirm_title": "Are you sure you want to delete this user?",
+  "admin_user_delete_confirm_description": "All orders for this user will also be deleted. This action cannot be undone.",
+  "admin_user_delete_confirm_ok": "Delete",
+  "admin_user_delete_confirm_cancel": "Cancel",
 
   "chat_photo_label": "Image",
   "delete": "Delete",

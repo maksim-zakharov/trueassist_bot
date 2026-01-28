@@ -128,6 +128,12 @@
   "bonuses_invites_empty_description": "Наверняка у вас есть друзья, которых вы можете пригласить в True Assist",
 
   "user_application_title": "Заявка",
+  "admin_user_settings_tab": "Настройки",
+  "admin_user_delete_btn": "Удалить",
+  "admin_user_delete_confirm_title": "Вы точно хотите удалить пользователя?",
+  "admin_user_delete_confirm_description": "Также удалятся заказы по пользователю. Изменения безвозвратны.",
+  "admin_user_delete_confirm_ok": "Удалить",
+  "admin_user_delete_confirm_cancel": "Отмена",
 
   "chat_photo_label": "Изображение",
   "delete": "Удалить",

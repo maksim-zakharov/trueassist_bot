@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { BonusOperation, Order, User } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 
@@ -70,5 +74,22 @@ export class UserService {
 
   getUsers(): Promise<User[]> {
     return this.prisma.user.findMany({});
+  }
+
+  /**
+   * Удаляет пользователя и все связанные сущности (заказы, адреса, связки с услугами и т.д.).
+   * BonusOperation, ScheduleDay, Application, Chat удаляются каскадом через БД.
+   */
+  async deleteUser(id: User['id']): Promise<void> {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) {
+      throw new NotFoundException('Пользователь не найден');
+    }
+    await this.prisma.$transaction(async (tx) => {
+      await tx.order.deleteMany({ where: { userId: id } });
+      await tx.address.deleteMany({ where: { userId: id } });
+      await tx.serviceExecutors.deleteMany({ where: { userId: id } });
+      await tx.user.delete({ where: { id } });
+    });
   }
 }
